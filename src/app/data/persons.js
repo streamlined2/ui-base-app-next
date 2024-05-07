@@ -1,4 +1,4 @@
-export let persons = [
+let persons = [
     {
         "id": 1,
         "name": "Hiram Horton",
@@ -1358,4 +1358,8 @@ export function deletePersonById(id) {
         return true;
     }
     return false;
+}
+
+export function getPersonData() {
+    return [...persons];
 }

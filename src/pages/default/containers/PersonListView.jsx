@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
-import { persons, deletePersonById } from 'app/data/persons';
+import { getPersonData } from 'app/data/persons';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -17,10 +17,10 @@ import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import LastPageIcon from '@mui/icons-material/LastPage';
 import DeleteButton from 'app/components/DeleteButton';
+import AddIcon from '@mui/icons-material/Add';
 
-function TablePaginationActions(props) {
+function TablePaginationActions({ count, page, rowsPerPage, onPageChange }) {
   const theme = useTheme();
-  const { count, page, rowsPerPage, onPageChange } = props;
 
   return (
     <Box sx={{ flexShrink: 0, ml: 2.5 }}>
@@ -70,18 +70,32 @@ TablePaginationActions.propTypes = {
 export default function PersonListView() {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [data, setData] = React.useState(getPersonData());
 
-  const personSelectionHandler = (event, personId) => {
-    alert("Person " + personId + " selected!");
-    event.stopPropagation();
+  const personSelectionHandler = (personId) => {
+    //alert("Person " + personId + " selected!");
+    //TODO redirect to user details window in view mode
   }
 
-  const personBinShowHandler = (event, personId) => {
-    event.stopPropagation();//TODO show/hide bin icon on mouse move
+  const personAddHandler = (personId) => {
+    alert("Person " + personId + " added!");
+    //TODO redirect to user details window in create mode
+  }
+
+  const personBinShowHandler = (personId) => {
   };
+
+  const updatePersonData = () => {
+    setData(getPersonData());
+  }
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+      <Box>
+        <IconButton onClick={personAddHandler}>
+          <AddIcon />
+        </IconButton>
+      </Box>
       <TableContainer sx={{ maxHeight: 600 }}>
         <Table sx={{ minWidth: 650 }} size="small" stickyHeader>
           <TableHead>
@@ -95,8 +109,7 @@ export default function PersonListView() {
           </TableHead>
           <TableBody>
             {
-              persons.
-                slice(page * rowsPerPage, (page + 1) * rowsPerPage).
+              data.slice(page * rowsPerPage, (page + 1) * rowsPerPage).
                 map(person => (
                   <TableRow
                     key={person.id}
@@ -111,7 +124,7 @@ export default function PersonListView() {
                     <TableCell>{person.countryOfOrigin.name}</TableCell>
                     <TableCell>{person.citizenship.name}</TableCell>
                     <TableCell>
-                      <DeleteButton id={person.id} name={person.name}/>
+                      <DeleteButton id={person.id} name={person.name} action={updatePersonData} />
                     </TableCell>
                   </TableRow>
                 ))
@@ -122,7 +135,7 @@ export default function PersonListView() {
           rowsPerPageOptions={[5, 10, 15, 20, 50]}
           colSpan={3}
           component="div"
-          count={persons.length}
+          count={data.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={(event, newPage) => setPage(newPage)}

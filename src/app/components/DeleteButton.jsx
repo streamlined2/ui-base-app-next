@@ -2,35 +2,63 @@ import * as React from 'react'
 import Snackbar from '@mui/material/Snackbar'
 import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
+import { deletePersonById } from 'app/data/persons';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
-export default function DeleteButton({ id, name }) {
-    const [open, setOpen] = React.useState(false);
+export default function DeleteButton({ id, name, action }) {
+    const timeout = 3000;
 
-    const handleClose = () => {
-        setOpen(false);
-    }
+    const [notificationOpen, setNotificationOpen] = React.useState(false);
+    const [alertOpen, setAlertOpen] = React.useState(false);
+    const [alertTitle, setAlertTitle] = React.useState("Please confirm");
+    const [alertMessage, setAlertMessage] = React.useState("Do you really want to delete this person " + name + " ?");
 
-    const personDeleteHandler = (event, personId, personName) => {
-        setOpen(true);
-        //confirm("Do you want to remove this person " + personName + "?");
-        /*
-        if (confirmed) {
-          const success = deletePersonById(personId);
-          if (success) {
-          }
+    const personDeleteHandler = () => {
+        setAlertOpen(true);
+    };
+
+    const handleCancel = () => {
+        setAlertOpen(false);
+    };
+
+    const handleOK = (personId) => {
+        const success = deletePersonById(personId);
+        if (success) {
+            setAlertOpen(false);
+            setNotificationOpen(true);
+            action();
+        } else {
+            setAlertMessage("Cannot delete this person.");
+            setAlertTitle("Deletion failed!");
         }
-        */
     };
 
     return (
         <>
-            <IconButton onClick={(event) => personDeleteHandler(event, id, name)}>
+            <IconButton onClick={personDeleteHandler}>
                 <DeleteIcon />
             </IconButton>
+            <Dialog open={alertOpen}
+                onClose={handleCancel}
+            >
+                <DialogTitle>{alertTitle}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>{alertMessage}</DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => handleOK(id)} autoFocus>OK</Button>
+                    <Button onClick={handleCancel}>Cancel</Button>
+                </DialogActions>
+            </Dialog>
             <Snackbar
-                open={open}
-                autoHideDuration="5000"
-                onClose={handleClose}
+                open={notificationOpen}
+                autoHideDuration={timeout}
+                onClose={() => setNotificationOpen(false)}
                 message={"Person " + name + " deleted successfully!"} />
         </>
     );
