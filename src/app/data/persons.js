@@ -1350,3 +1350,12 @@ export let persons = [
         "favoriteMeals": "banana,watermelon,pear"
     }
 ];
+
+export function deletePersonById(id) {
+    let index = persons.findIndex((element) => element.id === id);
+    if (index !== -1) {
+        persons.splice(index, 1);
+        return true;
+    }
+    return false;
+}

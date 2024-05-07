@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
-import { persons } from 'app/data/persons';
+import { persons, deletePersonById } from 'app/data/persons';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -16,6 +16,7 @@ import FirstPageIcon from '@mui/icons-material/FirstPage';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import LastPageIcon from '@mui/icons-material/LastPage';
+import DeleteButton from 'app/components/DeleteButton';
 
 function TablePaginationActions(props) {
   const theme = useTheme();
@@ -66,9 +67,18 @@ TablePaginationActions.propTypes = {
   rowsPerPage: PropTypes.number.isRequired,
 };
 
-function PersonListView() {
+export default function PersonListView() {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+
+  const personSelectionHandler = (event, personId) => {
+    alert("Person " + personId + " selected!");
+    event.stopPropagation();
+  }
+
+  const personBinShowHandler = (event, personId) => {
+    event.stopPropagation();//TODO show/hide bin icon on mouse move
+  };
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
@@ -88,12 +98,21 @@ function PersonListView() {
               persons.
                 slice(page * rowsPerPage, (page + 1) * rowsPerPage).
                 map(person => (
-                  <TableRow key={person.id} hover role="checkbox" tabIndex={-1}>
+                  <TableRow
+                    key={person.id}
+                    hover role="checkbox"
+                    tabIndex={-1}
+                    onClick={(event) => personSelectionHandler(event, person.id)}
+                    onMouseEnter={(event) => personBinShowHandler(event, person.id)}
+                  >
                     <TableCell>{person.name}</TableCell>
                     <TableCell>{person.birthday}</TableCell>
                     <TableCell>{person.sex === 'MALE' ? 'Male' : 'Female'}</TableCell>
                     <TableCell>{person.countryOfOrigin.name}</TableCell>
                     <TableCell>{person.citizenship.name}</TableCell>
+                    <TableCell>
+                      <DeleteButton id={person.id} name={person.name}/>
+                    </TableCell>
                   </TableRow>
                 ))
             }
@@ -114,5 +133,3 @@ function PersonListView() {
     </Paper>
   );
 }
-
-export default PersonListView;
