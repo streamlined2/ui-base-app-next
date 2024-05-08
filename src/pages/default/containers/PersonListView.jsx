@@ -80,22 +80,17 @@ export default function PersonListView() {
   const [personSex, setPersonSex] = React.useState("");
   const [personBirthdayStart, setPersonBirthdayStart] = React.useState("");
   const [personBirthdayEnd, setPersonBirthdayEnd] = React.useState("");
+  const [binPerson, setBinPerson] = React.useState(null);
+  const [binAnchor, setBinAnchor] = React.useState(null);
 
-  const personSelectionHandler = (personId) => {
-    //alert("Person " + personId + " selected!");
+  const personSelectionHandler = (name) => {
+    alert("Person " + name + " selected!");
     //TODO redirect to user details window in view mode
   }
 
-  const personAddHandler = (personId) => {
-    alert("Person " + personId + " added!");
+  const personAddHandler = () => {
+    alert("Person added!");
     //TODO redirect to user details window in create mode
-  }
-
-  const personBinShowHandler = (personId) => {
-  };
-
-  const updatePersonData = () => {
-    setData(getPersonData(filter));
   }
 
   const clearFilterHandler = () => {
@@ -118,6 +113,16 @@ export default function PersonListView() {
     };
     setFilter(newFilter);
     setData(getPersonData(newFilter));
+  };
+
+  const personBinShowHandler = (event, person) => {
+    setBinPerson(person);
+    setBinAnchor(event.currentTarget);
+  };
+
+  const personBinHideHandler = () => {
+    setBinPerson(null);
+    setBinAnchor(null);
   };
 
   return (
@@ -153,7 +158,7 @@ export default function PersonListView() {
                 id='name-end-field'
                 value={personNameEnd}
                 size='small'
-                label="...until"
+                label="...ending"
                 onChange={(event) => setPersonNameEnd(event.target.value)}
               />
             </Grid>
@@ -183,7 +188,7 @@ export default function PersonListView() {
                 id="birthday-finish-field"
                 value={personBirthdayEnd}
                 size='small'
-                label="...until"
+                label="...ending"
                 onChange={(event) => setPersonBirthdayEnd(event.target.value)}
               />
             </Grid>
@@ -209,8 +214,9 @@ export default function PersonListView() {
                     key={person.id}
                     hover role="checkbox"
                     tabIndex={-1}
-                    onClick={(event) => personSelectionHandler(event, person.id)}
-                    onMouseEnter={(event) => personBinShowHandler(event, person.id)}
+                    onClick={() => personSelectionHandler(person.name)}
+                    onMouseEnter={(event) => personBinShowHandler(event, person)}
+                    onMouseLeave={personBinHideHandler}
                   >
                     <TableCell>{person.name}</TableCell>
                     <TableCell>{person.birthday}</TableCell>
@@ -218,7 +224,7 @@ export default function PersonListView() {
                     <TableCell>{person.countryOfOrigin.name}</TableCell>
                     <TableCell>{person.citizenship.name}</TableCell>
                     <TableCell>
-                      <DeleteButton id={person.id} name={person.name} action={updatePersonData} />
+                      <DeleteButton person={person} action={() => setData(getPersonData(filter))} />
                     </TableCell>
                   </TableRow>
                 ))

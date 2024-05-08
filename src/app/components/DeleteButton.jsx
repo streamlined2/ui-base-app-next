@@ -10,13 +10,13 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
-export default function DeleteButton({ id, name, action }) {
+export default function DeleteButton({ person, action }) {
     const timeout = 3000;
 
     const [notificationOpen, setNotificationOpen] = React.useState(false);
     const [alertOpen, setAlertOpen] = React.useState(false);
     const [alertTitle, setAlertTitle] = React.useState("Please confirm");
-    const [alertMessage, setAlertMessage] = React.useState("Do you really want to delete this person " + name + " ?");
+    const [alertMessage, setAlertMessage] = React.useState("Do you really want to delete this person " + person.name + " ?");
 
     const personDeleteHandler = () => {
         setAlertOpen(true);
@@ -26,8 +26,9 @@ export default function DeleteButton({ id, name, action }) {
         setAlertOpen(false);
     };
 
-    const handleOK = (personId) => {
-        const success = deletePersonById(personId);
+    const handleOK = (person) => {
+        if (person === null) return;
+        const success = deletePersonById(person.id);
         if (success) {
             setAlertOpen(false);
             setNotificationOpen(true);
@@ -51,7 +52,7 @@ export default function DeleteButton({ id, name, action }) {
                     <DialogContentText>{alertMessage}</DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => handleOK(id)} autoFocus>OK</Button>
+                    <Button onClick={() => handleOK(person)} autoFocus>OK</Button>
                     <Button onClick={handleCancel}>Cancel</Button>
                 </DialogActions>
             </Dialog>
@@ -59,7 +60,7 @@ export default function DeleteButton({ id, name, action }) {
                 open={notificationOpen}
                 autoHideDuration={timeout}
                 onClose={() => setNotificationOpen(false)}
-                message={"Person " + name + " deleted successfully!"} />
+                message={"Person " + person.name + " deleted successfully!"} />
         </>
     );
 }
