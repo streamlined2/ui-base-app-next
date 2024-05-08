@@ -1360,6 +1360,35 @@ export function deletePersonById(id) {
     return false;
 }
 
-export function getPersonData() {
-    return [...persons];
+export function getPersonData(filter) {
+    if (typeof filter === "undefined") {
+        return [...persons];
+    }
+    const personList = persons.filter((person) => personFits(person, filter));
+    return [...personList];
+}
+
+function personFits(person, filter) {
+    return (
+        personNameFits(person, filter.nameStart, filter.nameEnd) &&
+        personSexFits(person, filter.sex) &&
+        personBirthdayFits(person, filter.birthdayStart, filter.birthdayEnd));
+}
+
+function personNameFits(person, nameStart, nameEnd) {
+    return (
+        (nameStart.trim().length === 0 || person.name.startsWith(nameStart) || nameStart <= person.name) &&
+        (nameEnd.trim().length === 0 || person.name.startsWith(nameEnd) || person.name <= nameEnd));
+}
+
+function personSexFits(person, sex) {
+    return (
+        sex.trim().length === 0 ||
+        person.sex.toLowerCase() === sex.toLowerCase());
+}
+
+function personBirthdayFits(person, birthdayStart, birthdayEnd) {
+    return (
+        (birthdayStart.trim().length === 0 || person.birthday.startsWith(birthdayStart) || birthdayStart <= person.birthday) &&
+        (birthdayEnd.trim().length === 0 || person.birthday.startsWith(birthdayEnd) || person.birthday <= birthdayEnd));
 }

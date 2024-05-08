@@ -74,7 +74,12 @@ export default function PersonListView() {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [data, setData] = React.useState(getPersonData());
-  const [filter, setFilter] = React.useState({});
+  const [filter, setFilter] = React.useState(undefined);
+  const [personNameStart, setPersonNameStart] = React.useState("");
+  const [personNameEnd, setPersonNameEnd] = React.useState("");
+  const [personSex, setPersonSex] = React.useState("");
+  const [personBirthdayStart, setPersonBirthdayStart] = React.useState("");
+  const [personBirthdayEnd, setPersonBirthdayEnd] = React.useState("");
 
   const personSelectionHandler = (personId) => {
     //alert("Person " + personId + " selected!");
@@ -90,66 +95,100 @@ export default function PersonListView() {
   };
 
   const updatePersonData = () => {
-    setData(getPersonData());
+    setData(getPersonData(filter));
   }
 
   const clearFilterHandler = () => {
-    setFilter({});
+    setPersonNameStart("");
+    setPersonNameEnd("");
+    setPersonSex("");
+    setPersonBirthdayStart("");
+    setPersonBirthdayEnd("");
+    setFilter(undefined);
+    setData(getPersonData(undefined));
   };
 
   const setFilterHandler = () => {
+    const newFilter = {
+      nameStart: personNameStart,
+      nameEnd: personNameEnd,
+      sex: personSex,
+      birthdayStart: personBirthdayStart,
+      birthdayEnd: personBirthdayEnd
+    };
+    setFilter(newFilter);
+    setData(getPersonData(newFilter));
   };
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
       <Container maxWidth="xl" sx={{ marginTop: 1 }}>
-        <Grid container xs={12} rowSpacing={1} columnSpacing={{ xs: 1, sm: 1, md: 1 }} alignItems="left">
-          <Grid item xs={1}>
-            <IconButton onClick={personAddHandler}>
-              <AddIcon />
-            </IconButton>
-          </Grid>
-          <Grid item xs={1}>
-            <IconButton onClick={clearFilterHandler}>
-              <FilterAltOffIcon />
-            </IconButton>
-          </Grid>
-          <Grid item xs={1}>
-            <IconButton onClick={setFilterHandler}>
-              <FilterAltIcon />
-            </IconButton>
-          </Grid>
-          <Grid item xs={3}>
-            <InputLabel id="name" size='small'>Name</InputLabel>
-            <TextField size='small'
-              labelId="name"
-              label="Name"
-            />
-          </Grid>
-          <Grid item xs={1}>
-            <InputLabel id="sex" size='small'>Sex</InputLabel>
-            <Select size='small'
-              labelId="sex"
-              label="Sex"
-            >
-              <MenuItem value="MALE" size='small'>Male</MenuItem>
-              <MenuItem value="FEMALE" size='small'>Female</MenuItem>
-            </Select>
-          </Grid>
-          <Grid container xs={2} rowSpacing={1} columnSpacing={{ xs: 1, sm: 1, md: 1 }} alignItems="left">
-            <Grid item>
-              <InputLabel id="birthday" size='small'>Birthday</InputLabel>
-              <TextField size='small'
-                id="birthday-start"
+        <Box sx={{ flexGrow: 1 }}>
+          <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 1, md: 1 }} alignItems="left">
+            <Grid item xs={1}>
+              <IconButton onClick={personAddHandler}>
+                <AddIcon />
+              </IconButton>
+            </Grid>
+            <Grid item xs={1}>
+              <IconButton onClick={clearFilterHandler}>
+                <FilterAltOffIcon />
+              </IconButton>
+            </Grid>
+            <Grid item xs={1}>
+              <IconButton onClick={setFilterHandler}>
+                <FilterAltIcon />
+              </IconButton>
+            </Grid>
+            <Grid item xs="2">
+              <InputLabel id="name" size='small'>Name</InputLabel>
+              <TextField
+                id='name-start-field'
+                value={personNameStart}
+                size='small'
                 label="starting..."
+                onChange={(event) => setPersonNameStart(event.target.value)}
               />
-              <TextField size='small'
-                id="birthday-finish"
+              <TextField
+                id='name-end-field'
+                value={personNameEnd}
+                size='small'
                 label="...until"
+                onChange={(event) => setPersonNameEnd(event.target.value)}
+              />
+            </Grid>
+            <Grid item xs="1">
+              <InputLabel id="sex" size='small'>Sex</InputLabel>
+              <Select
+                id='sex-selector'
+                value={personSex}
+                size='small'
+                label="Sex"
+                onChange={(event) => setPersonSex(event.target.value)}
+              >
+                <MenuItem key="male" value="MALE" size='small'>Male</MenuItem>
+                <MenuItem key="female" value="FEMALE" size='small'>Female</MenuItem>
+              </Select>
+            </Grid>
+            <Grid item xs="2">
+              <InputLabel id="birthday" size='small'>Birthday</InputLabel>
+              <TextField
+                id="birthday-start-field"
+                value={personBirthdayStart}
+                size='small'
+                label="starting..."
+                onChange={(event) => setPersonBirthdayStart(event.target.value)}
+              />
+              <TextField
+                id="birthday-finish-field"
+                value={personBirthdayEnd}
+                size='small'
+                label="...until"
+                onChange={(event) => setPersonBirthdayEnd(event.target.value)}
               />
             </Grid>
           </Grid>
-        </Grid>
+        </Box>
       </Container>
       <TableContainer sx={{ maxHeight: 600 }}>
         <Table sx={{ minWidth: 650 }} size="small" stickyHeader>
