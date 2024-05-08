@@ -18,6 +18,9 @@ import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import LastPageIcon from '@mui/icons-material/LastPage';
 import DeleteButton from 'app/components/DeleteButton';
 import AddIcon from '@mui/icons-material/Add';
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import FilterAltOffIcon from '@mui/icons-material/FilterAltOff';
+import { Container, Grid, TextField, Select, InputLabel, MenuItem } from '@mui/material';
 
 function TablePaginationActions({ count, page, rowsPerPage, onPageChange }) {
   const theme = useTheme();
@@ -71,6 +74,7 @@ export default function PersonListView() {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [data, setData] = React.useState(getPersonData());
+  const [filter, setFilter] = React.useState({});
 
   const personSelectionHandler = (personId) => {
     //alert("Person " + personId + " selected!");
@@ -89,13 +93,64 @@ export default function PersonListView() {
     setData(getPersonData());
   }
 
+  const clearFilterHandler = () => {
+    setFilter({});
+  };
+
+  const setFilterHandler = () => {
+  };
+
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-      <Box>
-        <IconButton onClick={personAddHandler}>
-          <AddIcon />
-        </IconButton>
-      </Box>
+      <Container maxWidth="xl" sx={{ marginTop: 1 }}>
+        <Grid container xs={12} rowSpacing={1} columnSpacing={{ xs: 1, sm: 1, md: 1 }} alignItems="left">
+          <Grid item xs={1}>
+            <IconButton onClick={personAddHandler}>
+              <AddIcon />
+            </IconButton>
+          </Grid>
+          <Grid item xs={1}>
+            <IconButton onClick={clearFilterHandler}>
+              <FilterAltOffIcon />
+            </IconButton>
+          </Grid>
+          <Grid item xs={1}>
+            <IconButton onClick={setFilterHandler}>
+              <FilterAltIcon />
+            </IconButton>
+          </Grid>
+          <Grid item xs={3}>
+            <InputLabel id="name" size='small'>Name</InputLabel>
+            <TextField size='small'
+              labelId="name"
+              label="Name"
+            />
+          </Grid>
+          <Grid item xs={1}>
+            <InputLabel id="sex" size='small'>Sex</InputLabel>
+            <Select size='small'
+              labelId="sex"
+              label="Sex"
+            >
+              <MenuItem value="MALE" size='small'>Male</MenuItem>
+              <MenuItem value="FEMALE" size='small'>Female</MenuItem>
+            </Select>
+          </Grid>
+          <Grid container xs={2} rowSpacing={1} columnSpacing={{ xs: 1, sm: 1, md: 1 }} alignItems="left">
+            <Grid item>
+              <InputLabel id="birthday" size='small'>Birthday</InputLabel>
+              <TextField size='small'
+                id="birthday-start"
+                label="starting..."
+              />
+              <TextField size='small'
+                id="birthday-finish"
+                label="...until"
+              />
+            </Grid>
+          </Grid>
+        </Grid>
+      </Container>
       <TableContainer sx={{ maxHeight: 600 }}>
         <Table sx={{ minWidth: 650 }} size="small" stickyHeader>
           <TableHead>
