@@ -3,7 +3,7 @@ import IntlProvider from 'misc/providers/IntlProvider';
 import useLocationSearch from 'misc/hooks/useLocationSearch';
 
 import getMessages from './intl';
-import PersonListView from './containers/PersonListView';
+import PersonListView from '../../app/components/PersonListView';
 
 function Index(props) {
   const {
