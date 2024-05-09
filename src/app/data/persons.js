@@ -1377,18 +1377,18 @@ function personFits(person, filter) {
 
 function personNameFits(person, nameStart, nameEnd) {
     return (
-        (nameStart.trim().length === 0 || person.name.startsWith(nameStart) || nameStart <= person.name) &&
-        (nameEnd.trim().length === 0 || person.name.startsWith(nameEnd) || person.name <= nameEnd));
+        (nameStart === null || nameStart === undefined || nameStart.trim().length === 0 || person.name.startsWith(nameStart) || nameStart <= person.name) &&
+        (nameEnd === null || nameEnd === undefined || nameEnd.trim().length === 0 || person.name.startsWith(nameEnd) || person.name <= nameEnd));
 }
 
 function personSexFits(person, sex) {
     return (
-        sex.trim().length === 0 ||
+        sex === null || sex === undefined || sex.trim().length === 0 ||
         person.sex.toLowerCase() === sex.toLowerCase());
 }
 
 function personBirthdayFits(person, birthdayStart, birthdayEnd) {
     return (
-        (birthdayStart.trim().length === 0 || person.birthday.startsWith(birthdayStart) || birthdayStart <= person.birthday) &&
-        (birthdayEnd.trim().length === 0 || person.birthday.startsWith(birthdayEnd) || person.birthday <= birthdayEnd));
+        (birthdayStart === null || birthdayStart === undefined || birthdayStart.trim().length === 0 || person.birthday.startsWith(birthdayStart) || birthdayStart <= person.birthday) &&
+        (birthdayEnd === null || birthdayEnd === undefined || birthdayEnd.trim().length === 0 || person.birthday.startsWith(birthdayEnd) || person.birthday <= birthdayEnd));
 }

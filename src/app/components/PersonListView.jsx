@@ -24,6 +24,7 @@ import { Container, Grid, TextField, Select, InputLabel, MenuItem } from '@mui/m
 import Popper from '@mui/material/Popper';
 import Fade from '@mui/material/Fade';
 import Fab from '@mui/material/Fab';
+import { getPersistentValue, updatePersistentValue, getDefaultValue } from 'utils/Utilities';
 
 function TablePaginationActions({ count, page, rowsPerPage, onPageChange }) {
   const theme = useTheme();
@@ -74,15 +75,18 @@ TablePaginationActions.propTypes = {
 };
 
 export default function PersonListView() {
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [data, setData] = React.useState(getPersonData());
-  const [filter, setFilter] = React.useState(undefined);
-  const [personNameStart, setPersonNameStart] = React.useState("");
-  const [personNameEnd, setPersonNameEnd] = React.useState("");
-  const [personSex, setPersonSex] = React.useState("");
-  const [personBirthdayStart, setPersonBirthdayStart] = React.useState("");
-  const [personBirthdayEnd, setPersonBirthdayEnd] = React.useState("");
+  const [page, setPage] = React.useState(getPersistentValue("PAGE", 0));
+  const [rowsPerPage, setRowsPerPage] = React.useState(getPersistentValue("ROWS_PER_PAGE", 5));
+  const prevFilter = getPersistentValue("FILTER", {});
+  const [filter, setFilter] = React.useState(prevFilter);
+  const [data, setData] = React.useState(getPersonData(prevFilter));
+
+  const [personNameStart, setPersonNameStart] = React.useState(getDefaultValue(prevFilter.nameStart, ""));
+  const [personNameEnd, setPersonNameEnd] = React.useState(getDefaultValue(prevFilter.nameEnd, ""));
+  const [personSex, setPersonSex] = React.useState(getDefaultValue(prevFilter.sex, ""));
+  const [personBirthdayStart, setPersonBirthdayStart] = React.useState(getDefaultValue(prevFilter.birthdayStart, ""));
+  const [personBirthdayEnd, setPersonBirthdayEnd] = React.useState(getDefaultValue(prevFilter.birthdayEnd, ""));
+
   const [binPerson, setBinPerson] = React.useState(null);
   const [binAnchor, setBinAnchor] = React.useState(null);
 
@@ -103,6 +107,7 @@ export default function PersonListView() {
     setPersonBirthdayStart("");
     setPersonBirthdayEnd("");
     setFilter(undefined);
+    updatePersistentValue("FILTER", undefined);
     setData(getPersonData(undefined));
   };
 
@@ -115,6 +120,7 @@ export default function PersonListView() {
       birthdayEnd: personBirthdayEnd
     };
     setFilter(newFilter);
+    updatePersistentValue("FILTER", newFilter);
     setData(getPersonData(newFilter));
   };
 
@@ -125,6 +131,18 @@ export default function PersonListView() {
 
   const personBinHideHandler = () => {
     setBinAnchor(null);
+  };
+
+  const pageChangeHandler = (event, newPage) => {
+    setPage(newPage);
+    updatePersistentValue("PAGE", newPage);
+  };
+
+  const rowsPerPageChangeHandler = (event) => {
+    const rowsPerPage = event.target.value;
+    setRowsPerPage(rowsPerPage);
+    setPage(0);
+    updatePersistentValue("ROWS_PER_PAGE", rowsPerPage);
   };
 
   return (
@@ -243,8 +261,8 @@ export default function PersonListView() {
           count={data.length}
           rowsPerPage={rowsPerPage}
           page={page}
-          onPageChange={(event, newPage) => setPage(newPage)}
-          onRowsPerPageChange={(event) => { setRowsPerPage(event.target.value); setPage(0); }}
+          onPageChange={pageChangeHandler}
+          onRowsPerPageChange={rowsPerPageChangeHandler}
           ActionsComponent={TablePaginationActions}
         />
       </TableContainer>
