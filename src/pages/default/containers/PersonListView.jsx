@@ -21,6 +21,9 @@ import AddIcon from '@mui/icons-material/Add';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import FilterAltOffIcon from '@mui/icons-material/FilterAltOff';
 import { Container, Grid, TextField, Select, InputLabel, MenuItem } from '@mui/material';
+import Popper from '@mui/material/Popper';
+import Fade from '@mui/material/Fade';
+import Fab from '@mui/material/Fab';
 
 function TablePaginationActions({ count, page, rowsPerPage, onPageChange }) {
   const theme = useTheme();
@@ -121,7 +124,6 @@ export default function PersonListView() {
   };
 
   const personBinHideHandler = () => {
-    setBinPerson(null);
     setBinAnchor(null);
   };
 
@@ -131,19 +133,25 @@ export default function PersonListView() {
         <Box sx={{ flexGrow: 1 }}>
           <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 1, md: 1 }} alignItems="left">
             <Grid item xs={1}>
-              <IconButton onClick={personAddHandler}>
-                <AddIcon />
-              </IconButton>
+              <Fab color="secondary">
+                <IconButton onClick={personAddHandler}>
+                  <AddIcon />
+                </IconButton>
+              </Fab>
             </Grid>
             <Grid item xs={1}>
-              <IconButton onClick={clearFilterHandler}>
-                <FilterAltOffIcon />
-              </IconButton>
+              <Fab color="secondary">
+                <IconButton onClick={clearFilterHandler}>
+                  <FilterAltOffIcon />
+                </IconButton>
+              </Fab>
             </Grid>
             <Grid item xs={1}>
-              <IconButton onClick={setFilterHandler}>
-                <FilterAltIcon />
-              </IconButton>
+              <Fab color="secondary">
+                <IconButton onClick={setFilterHandler}>
+                  <FilterAltIcon />
+                </IconButton>
+              </Fab>
             </Grid>
             <Grid item xs="2">
               <InputLabel id="name" size='small'>Name</InputLabel>
@@ -223,9 +231,6 @@ export default function PersonListView() {
                     <TableCell>{person.sex === 'MALE' ? 'Male' : 'Female'}</TableCell>
                     <TableCell>{person.countryOfOrigin.name}</TableCell>
                     <TableCell>{person.citizenship.name}</TableCell>
-                    <TableCell>
-                      <DeleteButton person={person} action={() => setData(getPersonData(filter))} />
-                    </TableCell>
                   </TableRow>
                 ))
             }
@@ -243,6 +248,20 @@ export default function PersonListView() {
           ActionsComponent={TablePaginationActions}
         />
       </TableContainer>
+      <Popper
+        open={binPerson !== null}
+        anchorEl={binAnchor}
+        placement="right"
+        onClose={personBinHideHandler}
+        transition>
+        {({ TransitionProps }) => (
+          <Fade {...TransitionProps} timeout={350}>
+            <Fab color="secondary">
+              <DeleteButton person={binPerson} action={() => setData(getPersonData(filter))} />
+            </Fab>
+          </Fade>
+        )}
+      </Popper>
     </Paper>
   );
 }

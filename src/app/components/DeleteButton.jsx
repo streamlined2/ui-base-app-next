@@ -9,16 +9,20 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import Alert from '@mui/material/Alert';
+import { Portal } from '@mui/base/Portal';
 
 export default function DeleteButton({ person, action }) {
     const timeout = 3000;
 
     const [notificationOpen, setNotificationOpen] = React.useState(false);
+    const [notificationMessage, setNotificationMessage] = React.useState("");
     const [alertOpen, setAlertOpen] = React.useState(false);
     const [alertTitle, setAlertTitle] = React.useState("Please confirm");
-    const [alertMessage, setAlertMessage] = React.useState("Do you really want to delete this person " + person.name + " ?");
+    const [alertMessage, setAlertMessage] = React.useState("");
 
     const personDeleteHandler = () => {
+        setAlertMessage("Do you really want to delete this person " + person.name + " ?");
         setAlertOpen(true);
     };
 
@@ -26,15 +30,23 @@ export default function DeleteButton({ person, action }) {
         setAlertOpen(false);
     };
 
+    const handleNotificationClose = () => {
+        setNotificationOpen(false);
+    };
+
     const handleOK = (person) => {
-        if (person === null) return;
+        if (person === null) {
+            console.log("Unexpected null person!");
+            return;
+        };
         const success = deletePersonById(person.id);
         if (success) {
             setAlertOpen(false);
+            setNotificationMessage(person.name + " deleted successfully!");
             setNotificationOpen(true);
             action();
         } else {
-            setAlertMessage("Cannot delete this person.");
+            setAlertMessage("Cannot delete " + person.name);
             setAlertTitle("Deletion failed!");
         }
     };
@@ -56,11 +68,26 @@ export default function DeleteButton({ person, action }) {
                     <Button onClick={handleCancel}>Cancel</Button>
                 </DialogActions>
             </Dialog>
-            <Snackbar
-                open={notificationOpen}
-                autoHideDuration={timeout}
-                onClose={() => setNotificationOpen(false)}
-                message={"Person " + person.name + " deleted successfully!"} />
+            <Portal>
+                <Snackbar
+                    open={notificationOpen}
+                    autoHideDuration={timeout}
+                    anchorOrigin={{
+                        vertical: "bottom",
+                        horizontal: "left"
+                    }}
+                    sx={{ position: "absolute" }}
+                    onClose={handleNotificationClose}>
+                    <Alert
+                        onClose={handleNotificationClose}
+                        severity="success"
+                        variant="filled"
+                        sx={{ width: '100%' }}
+                    >
+                        {notificationMessage}
+                    </Alert>
+                </Snackbar >
+            </Portal>
         </>
     );
 }
