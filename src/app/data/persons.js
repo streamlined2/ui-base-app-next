@@ -1351,6 +1351,14 @@ let persons = [
     }
 ];
 
+export function getPersonById(id) {
+    let index = persons.findIndex((element) => element.id === id);
+    if (index !== -1) {
+        return persons[index];
+    }
+    return null;
+}
+
 export function deletePersonById(id) {
     let index = persons.findIndex((element) => element.id === id);
     if (index !== -1) {

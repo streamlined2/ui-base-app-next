@@ -26,54 +26,6 @@ import Fade from '@mui/material/Fade';
 import Fab from '@mui/material/Fab';
 import { getPersistentValue, updatePersistentValue, getDefaultValue } from 'utils/Utilities';
 
-function TablePaginationActions({ count, page, rowsPerPage, onPageChange }) {
-  const theme = useTheme();
-
-  return (
-    <Box sx={{ flexShrink: 0, ml: 2.5 }}>
-      <IconButton
-        onClick={(event) => {
-          onPageChange(event, 0);
-        }}
-        disabled={page === 0}
-      >
-        {theme.direction === 'rtl' ? <LastPageIcon /> : <FirstPageIcon />}
-      </IconButton>
-      <IconButton
-        onClick={(event) => {
-          onPageChange(event, page - 1);
-        }}
-        disabled={page === 0}
-      >
-        {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
-      </IconButton>
-      <IconButton
-        onClick={(event) => {
-          onPageChange(event, page + 1);
-        }}
-        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-      >
-        {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
-      </IconButton>
-      <IconButton
-        onClick={(event) => {
-          onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
-        }}
-        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-      >
-        {theme.direction === 'rtl' ? <FirstPageIcon /> : <LastPageIcon />}
-      </IconButton>
-    </Box>
-  );
-}
-
-TablePaginationActions.propTypes = {
-  count: PropTypes.number.isRequired,
-  onPageChange: PropTypes.func.isRequired,
-  page: PropTypes.number.isRequired,
-  rowsPerPage: PropTypes.number.isRequired,
-};
-
 export default function PersonListView() {
   const [page, setPage] = React.useState(getPersistentValue("PAGE", 0));
   const [rowsPerPage, setRowsPerPage] = React.useState(getPersistentValue("ROWS_PER_PAGE", 5));
@@ -283,3 +235,51 @@ export default function PersonListView() {
     </Paper>
   );
 }
+
+function TablePaginationActions({ count, page, rowsPerPage, onPageChange }) {
+  const theme = useTheme();
+
+  return (
+    <Box sx={{ flexShrink: 0, ml: 2.5 }}>
+      <IconButton
+        onClick={(event) => {
+          onPageChange(event, 0);
+        }}
+        disabled={page === 0}
+      >
+        {theme.direction === 'rtl' ? <LastPageIcon /> : <FirstPageIcon />}
+      </IconButton>
+      <IconButton
+        onClick={(event) => {
+          onPageChange(event, page - 1);
+        }}
+        disabled={page === 0}
+      >
+        {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
+      </IconButton>
+      <IconButton
+        onClick={(event) => {
+          onPageChange(event, page + 1);
+        }}
+        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+      >
+        {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
+      </IconButton>
+      <IconButton
+        onClick={(event) => {
+          onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
+        }}
+        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+      >
+        {theme.direction === 'rtl' ? <FirstPageIcon /> : <LastPageIcon />}
+      </IconButton>
+    </Box>
+  );
+}
+
+TablePaginationActions.propTypes = {
+  count: PropTypes.number.isRequired,
+  onPageChange: PropTypes.func.isRequired,
+  page: PropTypes.number.isRequired,
+  rowsPerPage: PropTypes.number.isRequired,
+};
