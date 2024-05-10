@@ -1,9 +1,21 @@
 import * as React from 'react';
-import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import MenuItem from '@mui/material/MenuItem';
 import InputAdornment from '@mui/material/InputAdornment';
-import { countries as countryList } from 'app/data/countries';
+import { getCountryByName, getAllCountries } from 'app/data/countries';
+import { Container } from '@mui/material';
+import Fab from '@mui/material/Fab';
+import Grid from '@mui/material/Grid';
+import IconButton from '@mui/material/IconButton';
+import ModeEditIcon from '@mui/icons-material/ModeEdit';
+import UndoIcon from '@mui/icons-material/Undo';
+import CancelIcon from '@mui/icons-material/Cancel';
+import SaveIcon from '@mui/icons-material/Save';
+import NoteAddIcon from '@mui/icons-material/NoteAdd';
+import { savePerson } from 'app/data/persons';
+import Snackbar from '@mui/material/Snackbar'
+import Alert from '@mui/material/Alert';
+import { Portal } from '@mui/base/Portal';
 
 const CREATE = "create";
 const VIEW = "view";
@@ -24,7 +36,7 @@ const colors = [
     { value: "YELLOW", label: "Yellow" }
 ];
 
-const countries = countryList.map(country => {
+const countries = getAllCountries().map(country => {
     return (
         {
             value: country.name,
@@ -48,189 +60,311 @@ const emptyPerson = {
 
 export default function PersonEditor({ mode, person }) {
     const [currentData, setCurrentData] = React.useState(mode === CREATE ? emptyPerson : person);
+    const [previousData, setPreviousData] = React.useState(person);
+    const [currentMode, setCurrentMode] = React.useState(mode);
+    const [saveNotification, setSaveNotification] = React.useState(false);
+    const [saveNotificationMessage, setSaveNotificationMessage] = React.useState("");
+    const [saveSeverity, setSaveSeverity] = React.useState("success");
 
+    const notificationTimeout = 3000;
     const error = false;
-    const inputProps = (mode === VIEW) ? { readOnly: true } : { readOnly: false };
+    const getInputProperties = () => (currentMode === VIEW) ? { readOnly: true } : { readOnly: false };
 
-    const setValue = (event) => {
-        const property = event.target.name;
+    const handleSaveNotificationClose = () => {
+        setSaveNotification(false);
+    }
+
+    const setValue = (event, property) => {
         const updatedData = (
             {
                 ...currentData
             }
         );
         updatedData[property] = event.target.value;
+        setPreviousData(currentData);
         setCurrentData(updatedData);
+    };
+
+    const setCountry = (event, property) => {
+        const updatedData = (
+            {
+                ...currentData
+            }
+        );
+        const countryName = event.target.value;
+        updatedData[property] = getCountryByName(countryName);
+        setPreviousData(currentData);
+        setCurrentData(updatedData);
+    };
+
+    const startEditingHanlder = (event) => {
+        setCurrentMode(EDIT);
+    };
+
+    const goBackHandler = (event) => {
+        //TODO
+        alert("Going back");
+    };
+
+    const createHandler = (event) => {
+        saveHandler(event);
+    };
+
+    const saveHandler = (event) => {
+        if (savePerson({ ...currentData })) {
+            setCurrentMode(VIEW);
+            setSaveSeverity("success");
+            setSaveNotificationMessage("Person updated or added successfully!");
+            setSaveNotification(true);
+            return;
+        }
+        setSaveSeverity("error");
+        setSaveNotificationMessage("Can't update or add this person!");
+        setSaveNotification(true);
+    };
+
+    const cancelHandler = (event) => {
+        setCurrentData({ ...previousData });
+        setCurrentMode(VIEW);
     };
 
     return (
         <>
-            <Box component="form" noValidate autoComplete='off'>
-                <TextField
-                    id="name"
-                    label="Name"
-                    variant="outlined"
-                    required
-                    InputProps={inputProps}
-                    helperText="Please enter person's name"
-                    value={currentData.name}
-                    onChange={setValue}
-                    size="small"
-                />
-
-                <TextField
-                    id="birthday"
-                    label="Birthday"
-                    variant="outlined"
-                    required
-                    InputProps={inputProps}
-                    helperText="Please enter person's birthday"
-                    value={currentData.birthday}
-                    onChange={setValue}
-                    size="small"
-                />
-
-                <TextField
-                    id="sex"
-                    select
-                    label="Sex"
-                    variant="outlined"
-                    required
-                    InputProps={inputProps}
-                    helperText="Please select person's sex"
-                    value={currentData.sex}
-                    onChange={setValue}
-                    size="small"
-                >
-                    {
-                        sexes.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                                {option.label}
-                            </MenuItem>
-                        ))
-                    }
-                </TextField>
-
-                <TextField
-                    id="eyeColor"
-                    select
-                    label="Eye color"
-                    variant="outlined"
-                    InputProps={inputProps}
-                    helperText="Please select person's eye color"
-                    value={currentData.eyeColor}
-                    onChange={setValue}
-                    size="small"
-                >
-                    {
-                        colors.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                                {option.label}
-                            </MenuItem>
-                        ))
-                    }
-                </TextField>
-
-                <TextField
-                    id="hairColor"
-                    select
-                    label="Hair color"
-                    variant="outlined"
-                    InputProps={inputProps}
-                    helperText="Please select person's hair color"
-                    value={currentData.hairColor}
-                    onChange={setValue}
-                    size="small"
-                >
-                    {
-                        colors.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                                {option.label}
-                            </MenuItem>
-                        ))
-                    }
-                </TextField>
-
-                <TextField
-                    id="weight"
-                    label="Weight"
-                    variant="outlined"
-                    type="number"
-                    endAdornment={<InputAdornment position="end">kg</InputAdornment>}
-                    helperText="Please enter person's weight"
-                    InputProps={{ ...inputProps, shrink: true }}
-                    value={currentData.weight}
-                    onChange={setValue}
-                    size="small"
-                />
-
-                <TextField
-                    id="height"
-                    label="Height"
-                    variant="outlined"
-                    type="number"
-                    endAdornment={<InputAdornment position="end">cm</InputAdornment>}
-                    helperText="Please enter person's height"
-                    InputProps={{ ...inputProps, shrink: true }}
-                    value={currentData.height}
-                    onChange={setValue}
-                    size="small"
-                />
-
-                <TextField
-                    id="countryOfOrigin"
-                    select
-                    label="Country of origin"
-                    variant="outlined"
-                    InputProps={inputProps}
-                    helperText="Please select person's country of origin"
-                    value={currentData.countryOfOrigin.name}
-                    onChange={setValue}
-                    size="small"
-                >
-                    {
-                        countries.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                                {option.label}
-                            </MenuItem>
-                        ))
-                    }
-                </TextField>
-
-                <TextField
-                    id="citizenship"
-                    select
-                    label="Country of citizenship"
-                    variant="outlined"
-                    InputProps={inputProps}
-                    helperText="Please select person's country of citizenship"
-                    value={currentData.citizenship.name}
-                    onChange={setValue}
-                    size="small"
-                >
-                    {
-                        countries.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                                {option.label}
-                            </MenuItem>
-                        ))
-                    }
-                </TextField>
-
-                <TextField
-                    id="favoriteMeals"
-                    label="Favorite Meals"
-                    variant="outlined"
-                    helperText="Please enter person's favorite meals"
-                    InputProps={inputProps}
-                    multiline
-                    maxRows={4}
-                    value={currentData.favoriteMeals}
-                    onChange={setValue}
-                    size="small"
-                />
-
-            </Box>
+            <Container
+                sx={{
+                    margin: 2,
+                    width: 900,
+                    height: 400
+                }}
+            >
+                <Grid container rowSpacing={1} columnSpacing={20} alignItems="left">
+                    <Grid item xs={10}>
+                        <TextField
+                            id="name"
+                            label="Name"
+                            variant="outlined"
+                            required
+                            InputProps={getInputProperties()}
+                            helperText="Please enter person's name"
+                            value={currentData.name}
+                            onChange={(event) => setValue(event, "name")}
+                            size="small"
+                        />
+                        <TextField
+                            id="birthday"
+                            label="Birthday"
+                            variant="outlined"
+                            required
+                            InputProps={getInputProperties()}
+                            helperText="Please enter person's birthday"
+                            value={currentData.birthday}
+                            onChange={(event) => setValue(event, "birthday")}
+                            size="small"
+                        />
+                        <TextField
+                            id="sex"
+                            select
+                            label="Sex"
+                            variant="outlined"
+                            required
+                            InputProps={getInputProperties()}
+                            helperText="Please select person's sex"
+                            value={currentData.sex}
+                            onChange={(event) => setValue(event, "sex")}
+                            size="small"
+                        >
+                            {
+                                sexes.map((option) => (
+                                    <MenuItem key={option.value} value={option.value}>
+                                        {option.label}
+                                    </MenuItem>
+                                ))
+                            }
+                        </TextField>
+                        <TextField
+                            id="eyeColor"
+                            select
+                            label="Eye color"
+                            variant="outlined"
+                            InputProps={getInputProperties()}
+                            helperText="Please select person's eye color"
+                            value={currentData.eyeColor}
+                            onChange={(event) => setValue(event, "eyeColor")}
+                            size="small"
+                        >
+                            {
+                                colors.map((option) => (
+                                    <MenuItem key={option.value} value={option.value}>
+                                        {option.label}
+                                    </MenuItem>
+                                ))
+                            }
+                        </TextField>
+                        <TextField
+                            id="hairColor"
+                            select
+                            label="Hair color"
+                            variant="outlined"
+                            InputProps={getInputProperties()}
+                            helperText="Please select person's hair color"
+                            value={currentData.hairColor}
+                            onChange={(event) => setValue(event, "hairColor")}
+                            size="small"
+                        >
+                            {
+                                colors.map((option) => (
+                                    <MenuItem key={option.value} value={option.value}>
+                                        {option.label}
+                                    </MenuItem>
+                                ))
+                            }
+                        </TextField>
+                        <TextField
+                            id="weight"
+                            label="Weight"
+                            variant="outlined"
+                            type="number"
+                            endAdornment={<InputAdornment position="end">kg</InputAdornment>}
+                            helperText="Please enter person's weight"
+                            InputProps={{ ...getInputProperties(), shrink: true }}
+                            value={currentData.weight}
+                            onChange={(event) => setValue(event, "weight")}
+                            size="small"
+                        />
+                        <TextField
+                            id="height"
+                            label="Height"
+                            variant="outlined"
+                            type="number"
+                            endAdornment={<InputAdornment position="end">cm</InputAdornment>}
+                            helperText="Please enter person's height"
+                            InputProps={{ ...getInputProperties(), shrink: true }}
+                            value={currentData.height}
+                            onChange={(event) => setValue(event, "height")}
+                            size="small"
+                        />
+                        <TextField
+                            id="countryOfOrigin"
+                            select
+                            label="Country of origin"
+                            variant="outlined"
+                            InputProps={getInputProperties()}
+                            helperText="Please select person's country of origin"
+                            value={currentData.countryOfOrigin.name}
+                            onChange={(event) => setCountry(event, "countryOfOrigin")}
+                            size="small"
+                        >
+                            {
+                                countries.map((option) => (
+                                    <MenuItem key={option.value} value={option.value}>
+                                        {option.label}
+                                    </MenuItem>
+                                ))
+                            }
+                        </TextField>
+                        <TextField
+                            id="citizenship"
+                            select
+                            label="Country of citizenship"
+                            variant="outlined"
+                            InputProps={getInputProperties()}
+                            helperText="Please select person's country of citizenship"
+                            value={currentData.citizenship.name}
+                            onChange={(event) => setCountry(event, "citizenship")}
+                            size="small"
+                        >
+                            {
+                                countries.map((option) => (
+                                    <MenuItem key={option.value} value={option.value}>
+                                        {option.label}
+                                    </MenuItem>
+                                ))
+                            }
+                        </TextField>
+                        <TextField
+                            id="favoriteMeals"
+                            label="Favorite Meals"
+                            variant="outlined"
+                            helperText="Please enter person's favorite meals"
+                            InputProps={getInputProperties()}
+                            multiline
+                            minRows={4}
+                            maxRows={8}
+                            value={currentData.favoriteMeals}
+                            onChange={(event) => setValue(event, "favoriteMeals")}
+                            size="small"
+                        />
+                    </Grid>
+                    <Grid item xs={2}>
+                        {currentMode == VIEW && (
+                            <Fab color="secondary" variant="extended">
+                                <IconButton onClick={startEditingHanlder}>
+                                    <ModeEditIcon />
+                                </IconButton>
+                                Edit
+                            </Fab>
+                        )}
+                        {currentMode === CREATE && (
+                            <>
+                                <Fab color="secondary" variant="extended">
+                                    <IconButton onClick={createHandler}>
+                                        <NoteAddIcon />
+                                    </IconButton>
+                                    Create
+                                </Fab>
+                                <Fab color="secondary" variant="extended">
+                                    <IconButton onClick={goBackHandler}>
+                                        <CancelIcon />
+                                    </IconButton>
+                                    Cancel
+                                </Fab>
+                            </>
+                        )}
+                        {currentMode === EDIT && (
+                            <>
+                                <Fab color="secondary" variant="extended">
+                                    <IconButton onClick={saveHandler}>
+                                        <SaveIcon />
+                                    </IconButton>
+                                    Save
+                                </Fab>
+                                <Fab color="secondary" variant="extended">
+                                    <IconButton onClick={cancelHandler}>
+                                        <CancelIcon />
+                                    </IconButton>
+                                    Cancel
+                                </Fab>
+                            </>
+                        )}
+                        <Fab color="secondary" variant="extended">
+                            <IconButton onClick={goBackHandler}>
+                                <UndoIcon />
+                            </IconButton>
+                            Back
+                        </Fab>
+                    </Grid>
+                </Grid>
+                <Portal>
+                    <Snackbar
+                        open={saveNotification}
+                        autoHideDuration={notificationTimeout}
+                        anchorOrigin={{
+                            vertical: "bottom",
+                            horizontal: "left"
+                        }}
+                        sx={{ position: "absolute" }}
+                        onClose={handleSaveNotificationClose}>
+                        <Alert
+                            onClose={handleSaveNotificationClose}
+                            severity={saveSeverity}
+                            variant="filled"
+                            sx={{ width: '100%' }}
+                        >
+                            {saveNotificationMessage}
+                        </Alert>
+                    </Snackbar >
+                </Portal>
+            </Container >
         </>
     );
 }

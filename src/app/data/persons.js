@@ -1351,21 +1351,49 @@ let persons = [
     }
 ];
 
-export function getPersonById(id) {
-    let index = persons.findIndex((element) => element.id === id);
-    if (index !== -1) {
-        return persons[index];
+export function savePerson(person) {
+    if (person.id === null || person.id === undefined) {
+        return addPerson(person);
     }
-    return null;
+    const index = getPersonIndex(person.id);
+    if (index === -1) {
+        return false;
+    }
+    persons[index] = { ...person };
+    return true;
+}
+
+function addPerson(person) {
+    person.id = getNextId();
+    persons.push({ ...person });
+    return true;
+}
+
+function getNextId() {
+    return persons.reduce((previousValue, currentValue) => {
+        return previousValue < currentValue ? currentValue : previousValue;
+    }, 0) + 1;
+}
+
+export function getPersonById(id) {
+    const index = getPersonIndex(id);
+    if (index === -1) {
+        return null;
+    }
+    return persons[index];
 }
 
 export function deletePersonById(id) {
-    let index = persons.findIndex((element) => element.id === id);
-    if (index !== -1) {
-        persons.splice(index, 1);
-        return true;
+    const index = getPersonIndex(id);
+    if (index === -1) {
+        return false;
     }
-    return false;
+    persons.splice(index, 1);
+    return true;
+}
+
+function getPersonIndex(id) {
+    return persons.findIndex((element) => element.id === id);
 }
 
 export function getPersonData(filter) {
