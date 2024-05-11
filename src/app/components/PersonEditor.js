@@ -16,6 +16,7 @@ import { savePerson } from 'app/data/persons';
 import Snackbar from '@mui/material/Snackbar'
 import Alert from '@mui/material/Alert';
 import { Portal } from '@mui/base/Portal';
+import { isNameValid, isBirthdayValid, isWeightValid, isHeightValid, isFavoriteMeals } from 'app/data/persons';
 
 const CREATE = "create";
 const VIEW = "view";
@@ -65,6 +66,13 @@ export default function PersonEditor({ mode, person }) {
     const [saveNotification, setSaveNotification] = React.useState(false);
     const [saveNotificationMessage, setSaveNotificationMessage] = React.useState("");
     const [saveSeverity, setSaveSeverity] = React.useState("success");
+    const [errorStatus, setErrorStatus] = React.useState({
+        name: false,
+        birthday: false,
+        weight: false,
+        height: false,
+        favoriteMeals: false
+    });
 
     const notificationTimeout = 3000;
     const error = false;
@@ -111,7 +119,16 @@ export default function PersonEditor({ mode, person }) {
     };
 
     const saveHandler = (event) => {
-        if (savePerson({ ...currentData })) {
+        const person = { ...currentData };
+        const errorStatus = checkPerson(person);
+        setErrorStatus(errorStatus);
+        if (containsAnyErrors(errorStatus)) {
+            setSaveSeverity("error");
+            setSaveNotificationMessage("Incorrect person data!");
+            setSaveNotification(true);
+            return;
+        }
+        if (savePerson(person)) {
             setCurrentMode(VIEW);
             setSaveSeverity("success");
             setSaveNotificationMessage("Person updated or added successfully!");
@@ -125,6 +142,13 @@ export default function PersonEditor({ mode, person }) {
 
     const cancelHandler = (event) => {
         setCurrentData({ ...previousData });
+        setErrorStatus({
+            name: false,
+            birthday: false,
+            weight: false,
+            height: false,
+            favoriteMeals: false
+        });
         setCurrentMode(VIEW);
     };
 
@@ -140,23 +164,25 @@ export default function PersonEditor({ mode, person }) {
                 <Grid container rowSpacing={1} columnSpacing={20} alignItems="left">
                     <Grid item xs={10}>
                         <TextField
+                            error={errorStatus.name}
                             id="name"
                             label="Name"
                             variant="outlined"
                             required
                             InputProps={getInputProperties()}
-                            helperText="Please enter person's name"
+                            helperText="Please enter non-blank person's name of length 3 or greater"
                             value={currentData.name}
                             onChange={(event) => setValue(event, "name")}
                             size="small"
                         />
                         <TextField
+                            error={errorStatus.birthday}
                             id="birthday"
                             label="Birthday"
                             variant="outlined"
                             required
                             InputProps={getInputProperties()}
-                            helperText="Please enter person's birthday"
+                            helperText="Please enter person's birthday from the past in correct format"
                             value={currentData.birthday}
                             onChange={(event) => setValue(event, "birthday")}
                             size="small"
@@ -220,24 +246,26 @@ export default function PersonEditor({ mode, person }) {
                             }
                         </TextField>
                         <TextField
+                            error={errorStatus.weight}
                             id="weight"
                             label="Weight"
                             variant="outlined"
                             type="number"
                             endAdornment={<InputAdornment position="end">kg</InputAdornment>}
-                            helperText="Please enter person's weight"
+                            helperText="Please enter person's weight within range 50 to 150 kg"
                             InputProps={{ ...getInputProperties(), shrink: true }}
                             value={currentData.weight}
                             onChange={(event) => setValue(event, "weight")}
                             size="small"
                         />
                         <TextField
+                            error={errorStatus.height}
                             id="height"
                             label="Height"
                             variant="outlined"
                             type="number"
                             endAdornment={<InputAdornment position="end">cm</InputAdornment>}
-                            helperText="Please enter person's height"
+                            helperText="Please enter person's height within range 60 to 220 cm"
                             InputProps={{ ...getInputProperties(), shrink: true }}
                             value={currentData.height}
                             onChange={(event) => setValue(event, "height")}
@@ -282,10 +310,11 @@ export default function PersonEditor({ mode, person }) {
                             }
                         </TextField>
                         <TextField
+                            error={errorStatus.favoriteMeals}
                             id="favoriteMeals"
                             label="Favorite Meals"
                             variant="outlined"
-                            helperText="Please enter person's favorite meals"
+                            helperText="Please enter person's non-empty list of favorite meals separated by commas"
                             InputProps={getInputProperties()}
                             multiline
                             minRows={4}
@@ -296,8 +325,8 @@ export default function PersonEditor({ mode, person }) {
                         />
                     </Grid>
                     <Grid item xs={2}>
-                        {currentMode == VIEW && (
-                            <Fab color="secondary" variant="extended">
+                        {currentMode === VIEW && (
+                            <Fab color="secondary" variant="extended" size="small">
                                 <IconButton onClick={startEditingHanlder}>
                                     <ModeEditIcon />
                                 </IconButton>
@@ -306,13 +335,13 @@ export default function PersonEditor({ mode, person }) {
                         )}
                         {currentMode === CREATE && (
                             <>
-                                <Fab color="secondary" variant="extended">
+                                <Fab color="secondary" variant="extended" size="small">
                                     <IconButton onClick={createHandler}>
                                         <NoteAddIcon />
                                     </IconButton>
                                     Create
                                 </Fab>
-                                <Fab color="secondary" variant="extended">
+                                <Fab color="secondary" variant="extended" size="small">
                                     <IconButton onClick={goBackHandler}>
                                         <CancelIcon />
                                     </IconButton>
@@ -322,13 +351,13 @@ export default function PersonEditor({ mode, person }) {
                         )}
                         {currentMode === EDIT && (
                             <>
-                                <Fab color="secondary" variant="extended">
+                                <Fab color="secondary" variant="extended" size="small">
                                     <IconButton onClick={saveHandler}>
                                         <SaveIcon />
                                     </IconButton>
                                     Save
                                 </Fab>
-                                <Fab color="secondary" variant="extended">
+                                <Fab color="secondary" variant="extended" size="small">
                                     <IconButton onClick={cancelHandler}>
                                         <CancelIcon />
                                     </IconButton>
@@ -336,7 +365,7 @@ export default function PersonEditor({ mode, person }) {
                                 </Fab>
                             </>
                         )}
-                        <Fab color="secondary" variant="extended">
+                        <Fab color="secondary" variant="extended" size="small">
                             <IconButton onClick={goBackHandler}>
                                 <UndoIcon />
                             </IconButton>
@@ -367,4 +396,20 @@ export default function PersonEditor({ mode, person }) {
             </Container >
         </>
     );
+}
+
+function checkPerson(person) {
+    return (
+        {
+            name: !isNameValid(person.name),
+            birthday: !isBirthdayValid(person.birthday),
+            weight: !isWeightValid(person.weight),
+            height: !isHeightValid(person.height),
+            favoriteMeals: !isFavoriteMeals(person.favoriteMeals)
+        }
+    );
+}
+
+function containsAnyErrors(errorStatus) {
+    return errorStatus.name || errorStatus.birthday || errorStatus.weight || errorStatus.height || errorStatus.favoriteMeals;
 }

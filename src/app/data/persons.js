@@ -1,3 +1,5 @@
+import { NorthWest } from "@mui/icons-material";
+
 let persons = [
     {
         "id": 1,
@@ -1350,6 +1352,48 @@ let persons = [
         "favoriteMeals": "banana,watermelon,pear"
     }
 ];
+
+export function isNameValid(name) {
+    if (name == null || name == undefined) {
+        return false;
+    }
+    return name.trim().length >= 3;
+}
+
+export function isBirthdayValid(birthday) {
+    if (birthday == null || birthday == undefined) {
+        return false;
+    }
+    try {
+        const date = Date.parse(birthday);
+        return date < Date.now();
+    } catch (error) {
+        return false;
+    }
+}
+
+export function isWeightValid(weight) {
+    if (weight == null || weight == undefined) {
+        return false;
+    }
+    return 50 <= weight && weight <= 150;
+}
+
+export function isHeightValid(height) {
+    if (height == null || height == undefined) {
+        return false;
+    }
+    return 60 <= height && height <= 220;
+}
+
+export function isFavoriteMeals(meals) {
+    if (meals == null || meals == undefined) {
+        return false;
+    }
+    const regex = /\w{3,}(,\w{3,})*/;
+    const occurs = meals.match(regex);
+    return occurs.length > 0 && meals.length === occurs[0].length;
+}
 
 export function savePerson(person) {
     if (person.id === null || person.id === undefined) {
