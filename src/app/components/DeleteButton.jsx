@@ -12,9 +12,9 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Alert from '@mui/material/Alert';
 import { Portal } from '@mui/base/Portal';
 
-export default function DeleteButton({ person, action }) {
-    const timeout = 3000;
+const timeout = 3000;
 
+export default function DeleteButton({ person, action }) {
     const [notificationOpen, setNotificationOpen] = React.useState(false);
     const [notificationMessage, setNotificationMessage] = React.useState("");
     const [alertOpen, setAlertOpen] = React.useState(false);

@@ -25,11 +25,19 @@ import Popper from '@mui/material/Popper';
 import Fade from '@mui/material/Fade';
 import Fab from '@mui/material/Fab';
 import { getPersistentValue, updatePersistentValue, getDefaultValue } from 'utils/Utilities';
+import { useNavigate } from 'react-router-dom';
+import pageURLs from 'constants/pagesURLs';
+import * as pages from 'constants/pages';
+import * as action from 'app/constants/actionTypes';
+
+const PAGE_PARAMETER = "PAGE";
+const ROWS_PER_PAGE_PARAMETER = "ROWS_PER_PAGE";
+const FILTER_PARAMETER = "FILTER";
 
 export default function PersonListView() {
-  const [page, setPage] = React.useState(getPersistentValue("PAGE", 0));
-  const [rowsPerPage, setRowsPerPage] = React.useState(getPersistentValue("ROWS_PER_PAGE", 5));
-  const prevFilter = getPersistentValue("FILTER", {});
+  const [page, setPage] = React.useState(getPersistentValue(PAGE_PARAMETER, 0));
+  const [rowsPerPage, setRowsPerPage] = React.useState(getPersistentValue(ROWS_PER_PAGE_PARAMETER, 10));
+  const prevFilter = getPersistentValue(FILTER_PARAMETER, {});
   const [filter, setFilter] = React.useState(prevFilter);
   const [data, setData] = React.useState(getPersonData(prevFilter));
 
@@ -42,14 +50,14 @@ export default function PersonListView() {
   const [binPerson, setBinPerson] = React.useState(null);
   const [binAnchor, setBinAnchor] = React.useState(null);
 
-  const personSelectionHandler = (name) => {
-    alert("Person " + name + " selected!");
-    //TODO redirect to user details window in view mode
+  const navigate = useNavigate();
+
+  const personSelectionHandler = (person) => {
+    navigate(`${pageURLs[pages.personEditor]}/${action.VIEW}/${person.id}`);
   }
 
   const personAddHandler = () => {
-    alert("Person added!");
-    //TODO redirect to user details window in create mode
+    navigate(`${pageURLs[pages.personEditor]}/${action.CREATE}`);
   }
 
   const clearFilterHandler = () => {
@@ -59,7 +67,7 @@ export default function PersonListView() {
     setPersonBirthdayStart("");
     setPersonBirthdayEnd("");
     setFilter(undefined);
-    updatePersistentValue("FILTER", undefined);
+    updatePersistentValue(FILTER_PARAMETER, undefined);
     setData(getPersonData(undefined));
   };
 
@@ -72,7 +80,7 @@ export default function PersonListView() {
       birthdayEnd: personBirthdayEnd
     };
     setFilter(newFilter);
-    updatePersistentValue("FILTER", newFilter);
+    updatePersistentValue(FILTER_PARAMETER, newFilter);
     setData(getPersonData(newFilter));
   };
 
@@ -87,14 +95,14 @@ export default function PersonListView() {
 
   const pageChangeHandler = (event, newPage) => {
     setPage(newPage);
-    updatePersistentValue("PAGE", newPage);
+    updatePersistentValue(PAGE_PARAMETER, newPage);
   };
 
   const rowsPerPageChangeHandler = (event) => {
     const rowsPerPage = event.target.value;
     setRowsPerPage(rowsPerPage);
     setPage(0);
-    updatePersistentValue("ROWS_PER_PAGE", rowsPerPage);
+    updatePersistentValue(ROWS_PER_PAGE_PARAMETER, rowsPerPage);
   };
 
   return (
@@ -173,51 +181,57 @@ export default function PersonListView() {
           </Grid>
         </Box>
       </Container>
-      <TableContainer sx={{ maxHeight: 600 }}>
-        <Table sx={{ minWidth: 650 }} size="small" stickyHeader>
-          <TableHead>
-            <TableRow>
-              <TableCell align="center" style={{ minWidth: 200 }}>Name</TableCell>
-              <TableCell align="center" style={{ minWidth: 50 }}>Birthday</TableCell>
-              <TableCell align="left" style={{ minWidth: 30 }}>Sex</TableCell>
-              <TableCell align="left" style={{ minWidth: 50 }}>Country of origin</TableCell>
-              <TableCell align="left" style={{ minWidth: 50 }}>Country of citizenship</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {
-              data.slice(page * rowsPerPage, (page + 1) * rowsPerPage).
-                map(person => (
-                  <TableRow
-                    key={person.id}
-                    hover role="checkbox"
-                    tabIndex={-1}
-                    onClick={() => personSelectionHandler(person.name)}
-                    onMouseEnter={(event) => personBinShowHandler(event, person)}
-                    onMouseLeave={personBinHideHandler}
-                  >
-                    <TableCell>{person.name}</TableCell>
-                    <TableCell>{person.birthday}</TableCell>
-                    <TableCell>{person.sex === 'MALE' ? 'Male' : 'Female'}</TableCell>
-                    <TableCell>{person.countryOfOrigin.name}</TableCell>
-                    <TableCell>{person.citizenship.name}</TableCell>
-                  </TableRow>
-                ))
-            }
-          </TableBody>
-        </Table>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 15, 20, 50]}
-          colSpan={3}
-          component="div"
-          count={data.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={pageChangeHandler}
-          onRowsPerPageChange={rowsPerPageChangeHandler}
-          ActionsComponent={TablePaginationActions}
-        />
-      </TableContainer>
+      <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 1, md: 1 }} alignItems="left">
+        <Grid item xs={11}>
+          <TableContainer sx={{ maxHeight: 600 }}>
+            <Table sx={{ minWidth: 200 }} size="small" stickyHeader>
+              <TableHead>
+                <TableRow>
+                  <TableCell align="center" style={{ minWidth: 50 }}>Name</TableCell>
+                  <TableCell align="center" style={{ minWidth: 30 }}>Birthday</TableCell>
+                  <TableCell align="left" style={{ minWidth: 10 }}>Sex</TableCell>
+                  <TableCell align="left" style={{ minWidth: 20 }}>Country of origin</TableCell>
+                  <TableCell align="left" style={{ minWidth: 20 }}>Country of citizenship</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {
+                  data.slice(page * rowsPerPage, (page + 1) * rowsPerPage).
+                    map(person => (
+                      <TableRow
+                        key={person.id}
+                        hover role="checkbox"
+                        tabIndex={-1}
+                        onClick={() => personSelectionHandler(person)}
+                        onMouseEnter={(event) => personBinShowHandler(event, person)}
+                        onMouseLeave={personBinHideHandler}
+                      >
+                        <TableCell>{person.name}</TableCell>
+                        <TableCell>{person.birthday}</TableCell>
+                        <TableCell>{person.sex === 'MALE' ? 'Male' : 'Female'}</TableCell>
+                        <TableCell>{person.countryOfOrigin.name}</TableCell>
+                        <TableCell>{person.citizenship.name}</TableCell>
+                      </TableRow>
+                    ))
+                }
+              </TableBody>
+            </Table>
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 15, 20, 50]}
+              colSpan={3}
+              component="div"
+              count={data.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={pageChangeHandler}
+              onRowsPerPageChange={rowsPerPageChangeHandler}
+              ActionsComponent={TablePaginationActions}
+            />
+          </TableContainer>
+        </Grid>
+        <Grid item xs={1}>
+        </Grid>
+      </Grid>
       <Popper
         open={binPerson !== null}
         anchorEl={binAnchor}
@@ -227,7 +241,10 @@ export default function PersonListView() {
         {({ TransitionProps }) => (
           <Fade {...TransitionProps} timeout={350}>
             <Fab color="secondary">
-              <DeleteButton person={binPerson} action={() => setData(getPersonData(filter))} />
+              <DeleteButton person={binPerson} action={() => {
+                setBinPerson(null);
+                setData(getPersonData(filter));
+              }} />
             </Fab>
           </Fade>
         )}

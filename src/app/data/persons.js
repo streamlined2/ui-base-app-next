@@ -1414,7 +1414,7 @@ function addPerson(person) {
 }
 
 function getNextId() {
-    return persons.reduce((previousValue, currentValue) => {
+    return persons.map(person => person.id).reduce((previousValue, currentValue) => {
         return previousValue < currentValue ? currentValue : previousValue;
     }, 0) + 1;
 }

@@ -12,15 +12,16 @@ import UndoIcon from '@mui/icons-material/Undo';
 import CancelIcon from '@mui/icons-material/Cancel';
 import SaveIcon from '@mui/icons-material/Save';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
-import { savePerson } from 'app/data/persons';
+import { getPersonById, savePerson } from 'app/data/persons';
 import Snackbar from '@mui/material/Snackbar'
 import Alert from '@mui/material/Alert';
 import { Portal } from '@mui/base/Portal';
 import { isNameValid, isBirthdayValid, isWeightValid, isHeightValid, isFavoriteMeals } from 'app/data/persons';
-
-const CREATE = "create";
-const VIEW = "view";
-const EDIT = "edit";
+import * as action from 'app/constants/actionTypes';
+import { useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import pageURLs from 'constants/pagesURLs';
+import * as pages from 'constants/pages';
 
 const sexes = [
     { value: "MALE", label: "Male" },
@@ -59,8 +60,12 @@ const emptyPerson = {
     favoriteMeals: ""
 };
 
-export default function PersonEditor({ mode, person }) {
-    const [currentData, setCurrentData] = React.useState(mode === CREATE ? emptyPerson : person);
+export default function PersonEditor() {
+    const params = useParams();
+    const mode = params.mode;
+    const person = (mode === action.CREATE) ? emptyPerson : getPersonById(Number(params.personId));
+
+    const [currentData, setCurrentData] = React.useState(person);
     const [previousData, setPreviousData] = React.useState(person);
     const [currentMode, setCurrentMode] = React.useState(mode);
     const [saveNotification, setSaveNotification] = React.useState(false);
@@ -76,7 +81,7 @@ export default function PersonEditor({ mode, person }) {
 
     const notificationTimeout = 3000;
     const error = false;
-    const getInputProperties = () => (currentMode === VIEW) ? { readOnly: true } : { readOnly: false };
+    const getInputProperties = () => (currentMode === action.VIEW) ? { readOnly: true } : { readOnly: false };
 
     const handleSaveNotificationClose = () => {
         setSaveNotification(false);
@@ -106,12 +111,13 @@ export default function PersonEditor({ mode, person }) {
     };
 
     const startEditingHanlder = (event) => {
-        setCurrentMode(EDIT);
+        setCurrentMode(action.EDIT);
     };
 
-    const goBackHandler = (event) => {
-        //TODO
-        alert("Going back");
+    const navigate = useNavigate();
+
+    const goBackHandler = () => {
+        navigate(`${pageURLs[pages.personListView]}`);
     };
 
     const createHandler = (event) => {
@@ -129,7 +135,7 @@ export default function PersonEditor({ mode, person }) {
             return;
         }
         if (savePerson(person)) {
-            setCurrentMode(VIEW);
+            setCurrentMode(action.VIEW);
             setSaveSeverity("success");
             setSaveNotificationMessage("Person updated or added successfully!");
             setSaveNotification(true);
@@ -149,7 +155,7 @@ export default function PersonEditor({ mode, person }) {
             height: false,
             favoriteMeals: false
         });
-        setCurrentMode(VIEW);
+        setCurrentMode(action.VIEW);
     };
 
     return (
@@ -325,7 +331,7 @@ export default function PersonEditor({ mode, person }) {
                         />
                     </Grid>
                     <Grid item xs={2}>
-                        {currentMode === VIEW && (
+                        {currentMode === action.VIEW && (
                             <Fab color="secondary" variant="extended" size="small">
                                 <IconButton onClick={startEditingHanlder}>
                                     <ModeEditIcon />
@@ -333,7 +339,7 @@ export default function PersonEditor({ mode, person }) {
                                 Edit
                             </Fab>
                         )}
-                        {currentMode === CREATE && (
+                        {currentMode === action.CREATE && (
                             <>
                                 <Fab color="secondary" variant="extended" size="small">
                                     <IconButton onClick={createHandler}>
@@ -349,7 +355,7 @@ export default function PersonEditor({ mode, person }) {
                                 </Fab>
                             </>
                         )}
-                        {currentMode === EDIT && (
+                        {currentMode === action.EDIT && (
                             <>
                                 <Fab color="secondary" variant="extended" size="small">
                                     <IconButton onClick={saveHandler}>
