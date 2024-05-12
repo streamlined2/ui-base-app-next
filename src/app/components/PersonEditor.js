@@ -22,30 +22,7 @@ import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import pageURLs from 'constants/pagesURLs';
 import * as pages from 'constants/pages';
-
-const sexes = [
-    { value: "MALE", label: "Male" },
-    { value: "FEMALE", label: "Female" }
-];
-
-const colors = [
-    { value: "GRAY", label: "Gray" },
-    { value: "GREEN", label: "Green" },
-    { value: "BLUE", label: "Blue" },
-    { value: "BLACK", label: "Black" },
-    { value: "BROWN", label: "Brown" },
-    { value: "RED", label: "Red" },
-    { value: "YELLOW", label: "Yellow" }
-];
-
-const countries = getAllCountries().map(country => {
-    return (
-        {
-            value: country.name,
-            label: country.name
-        }
-    );
-});
+import { useIntl } from 'react-intl';
 
 const emptyPerson = {
     name: "",
@@ -78,6 +55,8 @@ export default function PersonEditor() {
         height: false,
         favoriteMeals: false
     });
+
+    const { formatMessage } = useIntl();
 
     const notificationTimeout = 3000;
     const error = false;
@@ -126,23 +105,23 @@ export default function PersonEditor() {
 
     const saveHandler = (event) => {
         const person = { ...currentData };
-        const errorStatus = checkPerson(person);
+        const errorStatus = getErrorStatus(person);
         setErrorStatus(errorStatus);
         if (containsAnyErrors(errorStatus)) {
             setSaveSeverity("error");
-            setSaveNotificationMessage("Incorrect person data!");
+            setSaveNotificationMessage(formatMessage({ id: "person.save.notification.incorrect-data" }));
             setSaveNotification(true);
             return;
         }
         if (savePerson(person)) {
             setCurrentMode(action.VIEW);
             setSaveSeverity("success");
-            setSaveNotificationMessage("Person updated or added successfully!");
+            setSaveNotificationMessage(formatMessage({ id: "person.save.notification.success" }));
             setSaveNotification(true);
             return;
         }
         setSaveSeverity("error");
-        setSaveNotificationMessage("Can't update or add this person!");
+        setSaveNotificationMessage(formatMessage({ id: "person.save.notification.fail" }));
         setSaveNotification(true);
     };
 
@@ -158,6 +137,30 @@ export default function PersonEditor() {
         setCurrentMode(action.VIEW);
     };
 
+    const sexes = [
+        { value: "MALE", label: formatMessage({ id: "filter.parameter.sex.male" }) },
+        { value: "FEMALE", label: formatMessage({ id: "filter.parameter.sex.female" }) }
+    ];
+
+    const colors = [
+        { value: "GRAY", label: formatMessage({ id: "color.gray" }) },
+        { value: "GREEN", label: formatMessage({ id: "color.green" }) },
+        { value: "BLUE", label: formatMessage({ id: "color.blue" }) },
+        { value: "BLACK", label: formatMessage({ id: "color.black" }) },
+        { value: "BROWN", label: formatMessage({ id: "color.brown" }) },
+        { value: "RED", label: formatMessage({ id: "color.red" }) },
+        { value: "YELLOW", label: formatMessage({ id: "color.yellow" }) }
+    ];
+
+    const countries = getAllCountries().map(country => {
+        return (
+            {
+                value: country.name,
+                label: country.name
+            }
+        );
+    });
+
     return (
         <>
             <Container
@@ -172,11 +175,11 @@ export default function PersonEditor() {
                         <TextField
                             error={errorStatus.name}
                             id="name"
-                            label="Name"
+                            label={formatMessage({ id: "filter.parameter.name" })}
                             variant="outlined"
                             required
                             InputProps={getInputProperties()}
-                            helperText="Please enter non-blank person's name of length 3 or greater"
+                            helperText={formatMessage({ id: "helpertext.name" })}
                             value={currentData.name}
                             onChange={(event) => setValue(event, "name")}
                             size="small"
@@ -184,11 +187,11 @@ export default function PersonEditor() {
                         <TextField
                             error={errorStatus.birthday}
                             id="birthday"
-                            label="Birthday"
+                            label={formatMessage({ id: "filter.parameter.birthday" })}
                             variant="outlined"
                             required
                             InputProps={getInputProperties()}
-                            helperText="Please enter person's birthday from the past in correct format"
+                            helperText={formatMessage({ id: "helpertext.birthday" })}
                             value={currentData.birthday}
                             onChange={(event) => setValue(event, "birthday")}
                             size="small"
@@ -196,11 +199,11 @@ export default function PersonEditor() {
                         <TextField
                             id="sex"
                             select
-                            label="Sex"
+                            label={formatMessage({ id: "filter.parameter.sex" })}
                             variant="outlined"
                             required
                             InputProps={getInputProperties()}
-                            helperText="Please select person's sex"
+                            helperText={formatMessage({ id: "helpertext.sex" })}
                             value={currentData.sex}
                             onChange={(event) => setValue(event, "sex")}
                             size="small"
@@ -216,10 +219,10 @@ export default function PersonEditor() {
                         <TextField
                             id="eyeColor"
                             select
-                            label="Eye color"
+                            label={formatMessage({ id: "filter.parameter.eyeColor" })}
                             variant="outlined"
                             InputProps={getInputProperties()}
-                            helperText="Please select person's eye color"
+                            helperText={formatMessage({ id: "helpertext.eyeColor" })}
                             value={currentData.eyeColor}
                             onChange={(event) => setValue(event, "eyeColor")}
                             size="small"
@@ -235,10 +238,10 @@ export default function PersonEditor() {
                         <TextField
                             id="hairColor"
                             select
-                            label="Hair color"
+                            label={formatMessage({ id: "filter.parameter.hairColor" })}
                             variant="outlined"
                             InputProps={getInputProperties()}
-                            helperText="Please select person's hair color"
+                            helperText={formatMessage({ id: "helpertext.hairColor" })}
                             value={currentData.hairColor}
                             onChange={(event) => setValue(event, "hairColor")}
                             size="small"
@@ -254,11 +257,11 @@ export default function PersonEditor() {
                         <TextField
                             error={errorStatus.weight}
                             id="weight"
-                            label="Weight"
+                            label={formatMessage({ id: "filter.parameter.weight" })}
                             variant="outlined"
                             type="number"
                             endAdornment={<InputAdornment position="end">kg</InputAdornment>}
-                            helperText="Please enter person's weight within range 50 to 150 kg"
+                            helperText={formatMessage({ id: "helpertext.weight" })}
                             InputProps={{ ...getInputProperties(), shrink: true }}
                             value={currentData.weight}
                             onChange={(event) => setValue(event, "weight")}
@@ -267,11 +270,11 @@ export default function PersonEditor() {
                         <TextField
                             error={errorStatus.height}
                             id="height"
-                            label="Height"
+                            label={formatMessage({ id: "filter.parameter.height" })}
                             variant="outlined"
                             type="number"
                             endAdornment={<InputAdornment position="end">cm</InputAdornment>}
-                            helperText="Please enter person's height within range 60 to 220 cm"
+                            helperText={formatMessage({ id: "helpertext.height" })}
                             InputProps={{ ...getInputProperties(), shrink: true }}
                             value={currentData.height}
                             onChange={(event) => setValue(event, "height")}
@@ -280,10 +283,10 @@ export default function PersonEditor() {
                         <TextField
                             id="countryOfOrigin"
                             select
-                            label="Country of origin"
+                            label={formatMessage({ id: "filter.parameter.countryOfOrigin" })}
                             variant="outlined"
                             InputProps={getInputProperties()}
-                            helperText="Please select person's country of origin"
+                            helperText={formatMessage({ id: "helpertext.countryOfOrigin" })}
                             value={currentData.countryOfOrigin.name}
                             onChange={(event) => setCountry(event, "countryOfOrigin")}
                             size="small"
@@ -299,10 +302,10 @@ export default function PersonEditor() {
                         <TextField
                             id="citizenship"
                             select
-                            label="Country of citizenship"
+                            label={formatMessage({ id: "filter.parameter.citizenship" })}
                             variant="outlined"
                             InputProps={getInputProperties()}
-                            helperText="Please select person's country of citizenship"
+                            helperText={formatMessage({ id: "helpertext.citizenship" })}
                             value={currentData.citizenship.name}
                             onChange={(event) => setCountry(event, "citizenship")}
                             size="small"
@@ -318,9 +321,9 @@ export default function PersonEditor() {
                         <TextField
                             error={errorStatus.favoriteMeals}
                             id="favoriteMeals"
-                            label="Favorite Meals"
+                            label={formatMessage({ id: "filter.parameter.favoriteMeals" })}
                             variant="outlined"
-                            helperText="Please enter person's non-empty list of favorite meals separated by commas"
+                            helperText={formatMessage({ id: "helpertext.favoriteMeals" })}
                             InputProps={getInputProperties()}
                             multiline
                             minRows={4}
@@ -336,7 +339,7 @@ export default function PersonEditor() {
                                 <IconButton onClick={startEditingHanlder}>
                                     <ModeEditIcon />
                                 </IconButton>
-                                Edit
+                                {formatMessage({ id: "button.person.edit" })}
                             </Fab>
                         )}
                         {currentMode === action.CREATE && (
@@ -345,13 +348,13 @@ export default function PersonEditor() {
                                     <IconButton onClick={createHandler}>
                                         <NoteAddIcon />
                                     </IconButton>
-                                    Create
+                                    {formatMessage({ id: "button.person.create" })}
                                 </Fab>
                                 <Fab color="secondary" variant="extended" size="small">
                                     <IconButton onClick={goBackHandler}>
                                         <CancelIcon />
                                     </IconButton>
-                                    Cancel
+                                    {formatMessage({ id: "button.person.cancel" })}
                                 </Fab>
                             </>
                         )}
@@ -361,13 +364,13 @@ export default function PersonEditor() {
                                     <IconButton onClick={saveHandler}>
                                         <SaveIcon />
                                     </IconButton>
-                                    Save
+                                    {formatMessage({ id: "button.person.save" })}
                                 </Fab>
                                 <Fab color="secondary" variant="extended" size="small">
                                     <IconButton onClick={cancelHandler}>
                                         <CancelIcon />
                                     </IconButton>
-                                    Cancel
+                                    {formatMessage({ id: "button.person.cancel" })}
                                 </Fab>
                             </>
                         )}
@@ -375,7 +378,7 @@ export default function PersonEditor() {
                             <IconButton onClick={goBackHandler}>
                                 <UndoIcon />
                             </IconButton>
-                            Back
+                            {formatMessage({ id: "button.person.back" })}
                         </Fab>
                     </Grid>
                 </Grid>
@@ -404,7 +407,7 @@ export default function PersonEditor() {
     );
 }
 
-function checkPerson(person) {
+function getErrorStatus(person) {
     return (
         {
             name: !isNameValid(person.name),

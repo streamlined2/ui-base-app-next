@@ -29,12 +29,15 @@ import { useNavigate } from 'react-router-dom';
 import pageURLs from 'constants/pagesURLs';
 import * as pages from 'constants/pages';
 import * as action from 'app/constants/actionTypes';
+import { useIntl } from 'react-intl';
 
 const PAGE_PARAMETER = "PAGE";
 const ROWS_PER_PAGE_PARAMETER = "ROWS_PER_PAGE";
 const FILTER_PARAMETER = "FILTER";
 
 export default function PersonListView() {
+  const { formatMessage } = useIntl();
+
   const [page, setPage] = React.useState(getPersistentValue(PAGE_PARAMETER, 0));
   const [rowsPerPage, setRowsPerPage] = React.useState(getPersistentValue(ROWS_PER_PAGE_PARAMETER, 10));
   const prevFilter = getPersistentValue(FILTER_PARAMETER, {});
@@ -105,6 +108,13 @@ export default function PersonListView() {
     updatePersistentValue(ROWS_PER_PAGE_PARAMETER, rowsPerPage);
   };
 
+  const getPersonSex = (sex) => {
+    return (sex === 'MALE') ? "Male" : "Female";
+  };
+  /*
+    formatMessage({ id: "filter.parameter.sex.male" }) :
+    formatMessage({ id: "filter.parameter.sex.female" });
+  */
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
       <Container maxWidth="xl" sx={{ marginTop: 1 }}>
@@ -132,49 +142,49 @@ export default function PersonListView() {
               </Fab>
             </Grid>
             <Grid item xs="2">
-              <InputLabel id="name" size='small'>Name</InputLabel>
+              <InputLabel id="name" size='small'>{formatMessage({ id: "filter.parameter.name" })}</InputLabel>
               <TextField
                 id='name-start-field'
                 value={personNameStart}
                 size='small'
-                label="starting..."
+                label={formatMessage({ id: "filter.parameter.name.start" })}
                 onChange={(event) => setPersonNameStart(event.target.value)}
               />
               <TextField
                 id='name-end-field'
                 value={personNameEnd}
                 size='small'
-                label="...ending"
+                label={formatMessage({ id: "filter.parameter.name.finish" })}
                 onChange={(event) => setPersonNameEnd(event.target.value)}
               />
             </Grid>
             <Grid item xs="1">
-              <InputLabel id="sex" size='small'>Sex</InputLabel>
+              <InputLabel id="sex" size='small'>{formatMessage({ id: "filter.parameter.sex" })}</InputLabel>
               <Select
                 id='sex-selector'
                 value={personSex}
                 size='small'
-                label="Sex"
+                label={formatMessage({ id: "filter.parameter.sex" })}
                 onChange={(event) => setPersonSex(event.target.value)}
               >
-                <MenuItem key="male" value="MALE" size='small'>Male</MenuItem>
-                <MenuItem key="female" value="FEMALE" size='small'>Female</MenuItem>
+                <MenuItem key="male" value="MALE" size='small'>{"Male"/*{formatMessage({ id: "filter.parameter.sex.male" })} */}</MenuItem>
+                <MenuItem key="female" value="FEMALE" size='small'>{"Female"/*formatMessage({ id: "filter.parameter.sex.female" })*/}</MenuItem>
               </Select>
             </Grid>
             <Grid item xs="2">
-              <InputLabel id="birthday" size='small'>Birthday</InputLabel>
+              <InputLabel id="birthday" size='small'>{formatMessage({ id: "filter.parameter.birthday" })}</InputLabel>
               <TextField
                 id="birthday-start-field"
                 value={personBirthdayStart}
                 size='small'
-                label="starting..."
+                label={formatMessage({ id: "filter.parameter.birthday.start" })}
                 onChange={(event) => setPersonBirthdayStart(event.target.value)}
               />
               <TextField
                 id="birthday-finish-field"
                 value={personBirthdayEnd}
                 size='small'
-                label="...ending"
+                label={formatMessage({ id: "filter.parameter.birthday.finish" })}
                 onChange={(event) => setPersonBirthdayEnd(event.target.value)}
               />
             </Grid>
@@ -187,11 +197,11 @@ export default function PersonListView() {
             <Table sx={{ minWidth: 200 }} size="small" stickyHeader>
               <TableHead>
                 <TableRow>
-                  <TableCell align="center" style={{ minWidth: 50 }}>Name</TableCell>
-                  <TableCell align="center" style={{ minWidth: 30 }}>Birthday</TableCell>
-                  <TableCell align="left" style={{ minWidth: 10 }}>Sex</TableCell>
-                  <TableCell align="left" style={{ minWidth: 20 }}>Country of origin</TableCell>
-                  <TableCell align="left" style={{ minWidth: 20 }}>Country of citizenship</TableCell>
+                  <TableCell align="center" style={{ minWidth: 50 }}>{formatMessage({ id: "person.list.header.name" })}</TableCell>
+                  <TableCell align="center" style={{ minWidth: 30 }}>{formatMessage({ id: "person.list.header.birthday" })}</TableCell>
+                  <TableCell align="left" style={{ minWidth: 10 }}>{formatMessage({ id: "person.list.header.sex" })}</TableCell>
+                  <TableCell align="left" style={{ minWidth: 20 }}>{formatMessage({ id: "person.list.header.countryOfOrigin" })}</TableCell>
+                  <TableCell align="left" style={{ minWidth: 20 }}>{formatMessage({ id: "person.list.header.citizenship" })}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -206,11 +216,11 @@ export default function PersonListView() {
                         onMouseEnter={(event) => personBinShowHandler(event, person)}
                         onMouseLeave={personBinHideHandler}
                       >
-                        <TableCell>{person.name}</TableCell>
-                        <TableCell>{person.birthday}</TableCell>
-                        <TableCell>{person.sex === 'MALE' ? 'Male' : 'Female'}</TableCell>
-                        <TableCell>{person.countryOfOrigin.name}</TableCell>
-                        <TableCell>{person.citizenship.name}</TableCell>
+                        <TableCell align="left">{person.name}</TableCell>
+                        <TableCell align="center">{person.birthday}</TableCell>
+                        <TableCell align="left">{getPersonSex(person.sex)}</TableCell>
+                        <TableCell align="left">{person.countryOfOrigin.name}</TableCell>
+                        <TableCell align="left">{person.citizenship.name}</TableCell>
                       </TableRow>
                     ))
                 }
@@ -223,6 +233,7 @@ export default function PersonListView() {
               count={data.length}
               rowsPerPage={rowsPerPage}
               page={page}
+              labelRowsPerPage={formatMessage({ id: "person.list.footer.rowsPerPage" })}
               onPageChange={pageChangeHandler}
               onRowsPerPageChange={rowsPerPageChangeHandler}
               ActionsComponent={TablePaginationActions}

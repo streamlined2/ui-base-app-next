@@ -11,18 +11,21 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Alert from '@mui/material/Alert';
 import { Portal } from '@mui/base/Portal';
+import { useIntl } from 'react-intl';
 
 const timeout = 3000;
 
 export default function DeleteButton({ person, action }) {
+    const { formatMessage } = useIntl();
+
     const [notificationOpen, setNotificationOpen] = React.useState(false);
     const [notificationMessage, setNotificationMessage] = React.useState("");
     const [alertOpen, setAlertOpen] = React.useState(false);
-    const [alertTitle, setAlertTitle] = React.useState("Please confirm");
+    const [alertTitle, setAlertTitle] = React.useState(formatMessage({ id: "person.delete.confirm.title" }));
     const [alertMessage, setAlertMessage] = React.useState("");
 
     const personDeleteHandler = () => {
-        setAlertMessage("Do you really want to delete this person " + person.name + " ?");
+        setAlertMessage(formatMessage({ id: "person.delete.confirm.question" }) + person.name + " ?");
         setAlertOpen(true);
     };
 
@@ -42,12 +45,12 @@ export default function DeleteButton({ person, action }) {
         const success = deletePersonById(person.id);
         if (success) {
             setAlertOpen(false);
-            setNotificationMessage(person.name + " deleted successfully!");
+            setNotificationMessage(person.name + formatMessage({ id: "person.delete.confirm.success" }));
             setNotificationOpen(true);
             action();
         } else {
-            setAlertMessage("Cannot delete " + person.name);
-            setAlertTitle("Deletion failed!");
+            setAlertMessage(formatMessage({ id: "person.delete.confirm.fail.message" }) + person.name);
+            setAlertTitle(formatMessage({ id: "person.delete.confirm.fail.title" }));
         }
     };
 
@@ -64,8 +67,8 @@ export default function DeleteButton({ person, action }) {
                     <DialogContentText>{alertMessage}</DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => handleOK(person)} autoFocus>OK</Button>
-                    <Button onClick={handleCancel}>Cancel</Button>
+                    <Button onClick={() => handleOK(person)} autoFocus>{formatMessage({ id: "button.ok" })}</Button>
+                    <Button onClick={handleCancel}>{formatMessage({ id: "button.cancel" })}</Button>
                 </DialogActions>
             </Dialog>
             <Portal>
