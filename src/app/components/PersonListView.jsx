@@ -35,11 +35,18 @@ const PAGE_PARAMETER = "PAGE";
 const ROWS_PER_PAGE_PARAMETER = "ROWS_PER_PAGE";
 const FILTER_PARAMETER = "FILTER";
 
+const FIRST_PAGE_NUMBER = 0;
+const DEFAULT_PAGE_SIZE = 10;
+
 export default function PersonListView() {
   const { formatMessage } = useIntl();
 
-  const [page, setPage] = React.useState(getPersistentValue(PAGE_PARAMETER, 0));
-  const [rowsPerPage, setRowsPerPage] = React.useState(getPersistentValue(ROWS_PER_PAGE_PARAMETER, 10));
+  const [page, setPage] = React.useState(getPersistentValue(PAGE_PARAMETER, FIRST_PAGE_NUMBER));
+  const [rowsPerPage, setRowsPerPage] = React.useState(getPersistentValue(ROWS_PER_PAGE_PARAMETER, DEFAULT_PAGE_SIZE));
+  const resetPageParameter = () => {
+    setPage(FIRST_PAGE_NUMBER);
+    updatePersistentValue(PAGE_PARAMETER, FIRST_PAGE_NUMBER);
+  };
   const prevFilter = getPersistentValue(FILTER_PARAMETER, {});
   const [filter, setFilter] = React.useState(prevFilter);
   const [data, setData] = React.useState(getPersonData(prevFilter));
@@ -70,6 +77,7 @@ export default function PersonListView() {
     setPersonBirthdayStart("");
     setPersonBirthdayEnd("");
     setFilter(undefined);
+    resetPageParameter();
     updatePersistentValue(FILTER_PARAMETER, undefined);
     setData(getPersonData(undefined));
   };
@@ -84,6 +92,7 @@ export default function PersonListView() {
     };
     setFilter(newFilter);
     updatePersistentValue(FILTER_PARAMETER, newFilter);
+    resetPageParameter();
     setData(getPersonData(newFilter));
   };
 
@@ -104,7 +113,8 @@ export default function PersonListView() {
   const rowsPerPageChangeHandler = (event) => {
     const rowsPerPage = event.target.value;
     setRowsPerPage(rowsPerPage);
-    setPage(0);
+    setPage(FIRST_PAGE_NUMBER);
+    updatePersistentValue(PAGE_PARAMETER, FIRST_PAGE_NUMBER);
     updatePersistentValue(ROWS_PER_PAGE_PARAMETER, rowsPerPage);
   };
 
