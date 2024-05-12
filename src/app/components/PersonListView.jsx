@@ -130,24 +130,11 @@ export default function PersonListView() {
       <Container maxWidth="xl" sx={{ marginTop: 1 }}>
         <Box sx={{ flexGrow: 1 }}>
           <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 1, md: 1 }} alignItems="left">
-            <Grid item xs={1}>
-              <Fab color="secondary">
+            <Grid item xs="2">
+              <Fab color="secondary" variant="extended" size="small">
                 <IconButton onClick={personAddHandler}>
                   <AddIcon />
-                </IconButton>
-              </Fab>
-            </Grid>
-            <Grid item xs={1}>
-              <Fab color="secondary">
-                <IconButton onClick={clearFilterHandler}>
-                  <FilterAltOffIcon />
-                </IconButton>
-              </Fab>
-            </Grid>
-            <Grid item xs={1}>
-              <Fab color="secondary">
-                <IconButton onClick={setFilterHandler}>
-                  <FilterAltIcon />
+                  {formatMessage({ id: "button.person.add" })}
                 </IconButton>
               </Fab>
             </Grid>
@@ -197,6 +184,20 @@ export default function PersonListView() {
                 label={formatMessage({ id: "filter.parameter.birthday.finish" })}
                 onChange={(event) => setPersonBirthdayEnd(event.target.value)}
               />
+            </Grid>
+            <Grid item xs={2}>
+              <Fab color="secondary" variant="extended" size="small">
+                <IconButton onClick={setFilterHandler}>
+                  <FilterAltIcon />
+                  {formatMessage({ id: "button.person.filter.set" })}
+                </IconButton>
+              </Fab>
+              <Fab color="secondary" variant="extended" size="small">
+                <IconButton onClick={clearFilterHandler}>
+                  <FilterAltOffIcon />
+                  {formatMessage({ id: "button.person.filter.clear" })}
+                </IconButton>
+              </Fab>
             </Grid>
           </Grid>
         </Box>
