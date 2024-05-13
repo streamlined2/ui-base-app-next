@@ -16,7 +16,7 @@ import { getPersonById, savePerson } from 'app/data/persons';
 import Snackbar from '@mui/material/Snackbar'
 import Alert from '@mui/material/Alert';
 import { Portal } from '@mui/base/Portal';
-import { isNameValid, isBirthdayValid, isWeightValid, isHeightValid, isFavoriteMeals } from 'app/data/persons';
+import { isNameValid, isBirthdayValid, isWeightValid, isHeightValid, isFavoriteMealsValid } from 'app/data/persons';
 import * as action from 'app/constants/actionTypes';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
@@ -414,7 +414,7 @@ function getErrorStatus(person) {
             birthday: !isBirthdayValid(person.birthday),
             weight: !isWeightValid(person.weight),
             height: !isHeightValid(person.height),
-            favoriteMeals: !isFavoriteMeals(person.favoriteMeals)
+            favoriteMeals: !isFavoriteMealsValid(person.favoriteMeals)
         }
     );
 }

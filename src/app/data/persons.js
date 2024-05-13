@@ -1386,7 +1386,7 @@ export function isHeightValid(height) {
     return 60 <= height && height <= 220;
 }
 
-export function isFavoriteMeals(meals) {
+export function isFavoriteMealsValid(meals) {
     if (meals == null || meals == undefined) {
         return false;
     }
