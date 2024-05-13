@@ -1392,7 +1392,7 @@ export function isFavoriteMeals(meals) {
     }
     const regex = /\w{3,}(,\w{3,})*/;
     const occurs = meals.match(regex);
-    return occurs.length > 0 && meals.length === occurs[0].length;
+    return occurs !== null && occurs.length > 0 && meals.length === occurs[0].length;
 }
 
 export function savePerson(person) {
