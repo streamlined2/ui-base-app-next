@@ -121,10 +121,7 @@ export default function PersonListView() {
   const getPersonSex = (sex) => {
     return (sex === 'MALE') ? "Male" : "Female";
   };
-  /*
-    formatMessage({ id: "filter.parameter.sex.male" }) :
-    formatMessage({ id: "filter.parameter.sex.female" });
-  */
+
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
       <Container maxWidth="xl" sx={{ marginTop: 1 }}>
@@ -164,8 +161,8 @@ export default function PersonListView() {
                 label={formatMessage({ id: "filter.parameter.sex" })}
                 onChange={(event) => setPersonSex(event.target.value)}
               >
-                <MenuItem key="male" value="MALE" size='small'>{"Male"/*{formatMessage({ id: "filter.parameter.sex.male" })} */}</MenuItem>
-                <MenuItem key="female" value="FEMALE" size='small'>{"Female"/*formatMessage({ id: "filter.parameter.sex.female" })*/}</MenuItem>
+                <MenuItem key="male" value="MALE" size='small'>Male</MenuItem>
+                <MenuItem key="female" value="FEMALE" size='small'>Female</MenuItem>
               </Select>
             </Grid>
             <Grid item xs="2">

@@ -42,6 +42,32 @@ export default function PersonEditor() {
     const mode = params.mode;
     const person = (mode === action.CREATE) ? emptyPerson : getPersonById(Number(params.personId));
 
+    const { formatMessage } = useIntl();
+
+    const sexes = [
+        { value: "MALE", label: formatMessage({ id: "filter.parameter.sex.male" }) },
+        { value: "FEMALE", label: formatMessage({ id: "filter.parameter.sex.female" }) }
+    ];
+
+    const colors = [
+        { value: "GRAY", label: formatMessage({ id: "color.gray" }) },
+        { value: "GREEN", label: formatMessage({ id: "color.green" }) },
+        { value: "BLUE", label: formatMessage({ id: "color.blue" }) },
+        { value: "BLACK", label: formatMessage({ id: "color.black" }) },
+        { value: "BROWN", label: formatMessage({ id: "color.brown" }) },
+        { value: "RED", label: formatMessage({ id: "color.red" }) },
+        { value: "YELLOW", label: formatMessage({ id: "color.yellow" }) }
+    ];
+
+    const countries = getAllCountries().map(country => {
+        return (
+            {
+                value: country.name,
+                label: country.name
+            }
+        );
+    });
+
     const [currentData, setCurrentData] = React.useState(person);
     const [previousData, setPreviousData] = React.useState(person);
     const [currentMode, setCurrentMode] = React.useState(mode);
@@ -56,10 +82,7 @@ export default function PersonEditor() {
         favoriteMeals: false
     });
 
-    const { formatMessage } = useIntl();
-
     const notificationTimeout = 3000;
-    const error = false;
     const getInputProperties = () => (currentMode === action.VIEW) ? { readOnly: true } : { readOnly: false };
 
     const handleSaveNotificationClose = () => {
@@ -89,7 +112,7 @@ export default function PersonEditor() {
         setCurrentData(updatedData);
     };
 
-    const startEditingHanlder = (event) => {
+    const startEditingHanlder = () => {
         setCurrentMode(action.EDIT);
     };
 
@@ -99,11 +122,11 @@ export default function PersonEditor() {
         navigate(`${pageURLs[pages.personListView]}`);
     };
 
-    const createHandler = (event) => {
-        saveHandler(event);
+    const createHandler = () => {
+        saveHandler();
     };
 
-    const saveHandler = (event) => {
+    const saveHandler = () => {
         const person = { ...currentData };
         const errorStatus = getErrorStatus(person);
         setErrorStatus(errorStatus);
@@ -125,7 +148,7 @@ export default function PersonEditor() {
         setSaveNotification(true);
     };
 
-    const cancelHandler = (event) => {
+    const cancelHandler = () => {
         setCurrentData({ ...previousData });
         setErrorStatus({
             name: false,
@@ -136,30 +159,6 @@ export default function PersonEditor() {
         });
         setCurrentMode(action.VIEW);
     };
-
-    const sexes = [
-        { value: "MALE", label: formatMessage({ id: "filter.parameter.sex.male" }) },
-        { value: "FEMALE", label: formatMessage({ id: "filter.parameter.sex.female" }) }
-    ];
-
-    const colors = [
-        { value: "GRAY", label: formatMessage({ id: "color.gray" }) },
-        { value: "GREEN", label: formatMessage({ id: "color.green" }) },
-        { value: "BLUE", label: formatMessage({ id: "color.blue" }) },
-        { value: "BLACK", label: formatMessage({ id: "color.black" }) },
-        { value: "BROWN", label: formatMessage({ id: "color.brown" }) },
-        { value: "RED", label: formatMessage({ id: "color.red" }) },
-        { value: "YELLOW", label: formatMessage({ id: "color.yellow" }) }
-    ];
-
-    const countries = getAllCountries().map(country => {
-        return (
-            {
-                value: country.name,
-                label: country.name
-            }
-        );
-    });
 
     return (
         <>
@@ -420,5 +419,10 @@ function getErrorStatus(person) {
 }
 
 function containsAnyErrors(errorStatus) {
-    return errorStatus.name || errorStatus.birthday || errorStatus.weight || errorStatus.height || errorStatus.favoriteMeals;
+    return (
+        errorStatus.name ||
+        errorStatus.birthday ||
+        errorStatus.weight ||
+        errorStatus.height ||
+        errorStatus.favoriteMeals);
 }
