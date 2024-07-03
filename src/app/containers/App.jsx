@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   BrowserRouter,
   Routes,
@@ -25,6 +25,9 @@ import Header from '../components/Header';
 import IntlProvider from '../components/IntlProvider';
 import MissedPage from '../components/MissedPage';
 import SearchParamsConfigurator from '../components/SearchParamsConfigurator';
+
+import PersonListView from 'app/components/PersonListView';
+import PersonEditor from 'app/components/PersonEditor';
 
 function App() {
   const dispatch = useDispatch();
@@ -71,6 +74,18 @@ function App() {
                 )}
                 {!isFetchingUser && (
                   <Routes>
+                    <Route
+                      element={<PersonListView />}
+                      path={`${pageURLs[pages.personListView]}`}
+                    />
+                    <Route
+                      element={<PersonEditor />}
+                      path={`${pageURLs[pages.personEditor]}/:mode/:personId`}
+                    />
+                    <Route
+                      element={<PersonEditor />}
+                      path={`${pageURLs[pages.personEditor]}/:mode`}
+                    />
                     <Route
                       element={<DefaultPage />}
                       path={`${pageURLs[pages.defaultPage]}`}
